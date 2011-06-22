@@ -421,8 +421,6 @@ def draw_one(fileList,canvases,candidate,nPads,histos) :
       histos[QUANT][SAMPLE].GetYaxis().SetRangeUser(0.8*ymin,1.2*ymax)
       histos[QUANT][SAMPLE].Draw()
     else:
-      histos[QUANT][SAMPLE].Scale(0.5)
-      print bcolors.FAIL+"WATCH OUT SCALING IS STILL IN THE CODE - NEED TO REMOVE THIS!"+bcolors.ENDC
       histos[QUANT][SAMPLE].Draw("same")
       
   canvases[candidate].Update()
