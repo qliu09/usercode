@@ -7,7 +7,8 @@ import os
 import re
 
 
-from cpt_utilities import *
+#from cpt_utilities import *
+from new_utils import *
 from cpt_SYS_plugin import *
 
 
