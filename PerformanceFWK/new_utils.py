@@ -32,10 +32,6 @@ def makeabstracthisto1d2d3d(command,samplename,tree,c1,whichjob) :
   addendum=""
   if(command.find(":")==-1 and whichjob==-1) :
     # one dimensional draw command (standard)
-    if(command=="Error") :
-      tree.Draw(command+">>h_"+samplename+"_"+repcommand)
-    else :
-      tree.Draw(command+">>h_"+samplename+"_"+repcommand)
     tree.Draw(command+">>h_"+samplename+"_"+repcommand)
     tempobject = ROOT.gPad.GetPrimitive(("h_"+samplename+"_"+repcommand+addendum));
   else :
