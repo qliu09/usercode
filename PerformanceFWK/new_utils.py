@@ -33,7 +33,7 @@ def makeabstracthisto1d2d3d(command,samplename,tree,c1,whichjob) :
   if(command.find(":")==-1 and whichjob==-1) :
     # one dimensional draw command (standard)
     if(command=="Error") :
-      tree.Draw(command+":Error_weight>>h_"+samplename+"_"+repcommand)
+      tree.Draw(command+">>h_"+samplename+"_"+repcommand)
     else :
       tree.Draw(command+">>h_"+samplename+"_"+repcommand)
     tree.Draw(command+">>h_"+samplename+"_"+repcommand)
@@ -440,6 +440,7 @@ def processallvariables(variables,variablecollection,filename,performancetree,hi
 	for candidate in candidates:
 	  if candidate == "Error_weight" :
 	    continue ## error weight is just basically the number of times a specific error code was encountered -> only relevant for success rate (handled in "Error" case)
+	    #this has actually been replaced in the latest version.
 	  if not canvases.has_key(candidate):
 #	    print "starting round for candidate",candidate
 	    candcounter+=1
@@ -474,7 +475,7 @@ def processallvariables(variables,variablecollection,filename,performancetree,hi
 		  histos[QUANT][SAMPLE][i] = makeabstracthisto1d2d3d(candidate,SAMPLE,performancetree[file],plotcanvas,i)
 		  if dosummary==True: stats[SAMPLE][QUANT][i]=(histos[QUANT][SAMPLE][i].GetMean(),histos[QUANT][SAMPLE][i].GetRMS())
 	      if candidate == "Error" :
-		stats[SAMPLE]["Failures"] = failurehisto=(makeabstracthisto1d2d3d("Error_weight",SAMPLE,performancetree[file],plotcanvas,-1)).Integral()
+		stats[SAMPLE]["Failures"] = failurehisto=(makeabstracthisto1d2d3d("Error",SAMPLE,performancetree[file],plotcanvas,-1)).Integral()
 		if not histos.has_key("TimeJob_CpuPercentage"):
 		  stats[SAMPLE]["Success"] = 0
 		elif not histos["TimeJob_CpuPercentage"].has_key(SAMPLE):
