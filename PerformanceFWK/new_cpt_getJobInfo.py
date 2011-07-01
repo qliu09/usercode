@@ -4,7 +4,7 @@
 #
 # Author: Leonardo Sala <leonardo.sala@cern.ch>
 #
-# $Id: cpt_getJobInfo.py,v 1.7 2010/05/17 13:05:46 leo Exp $
+# $Id: new_cpt_getJobInfo.py,v 1.1 2011/06/22 09:09:16 buchmann Exp $
 #################################################################
 
 ### plugins moved to a directory
@@ -214,17 +214,14 @@ def getJobStatistics(LOGDIR,OUTFILE):
 	    if label=="Error":
 	      valueContainer[label]=ROOT.std.vector( float )()
 	      perfTree.Branch(str(makeCleanLabel(label,job_output)),valueContainer[str(label)])
-	      valueContainer[label+"_weight"]=ROOT.std.vector( float )()
-	      perfTree.Branch(str(makeCleanLabel(label,job_output))+"_weight",valueContainer[str(label)])
+#	      valueContainer[label+"_weight"]=ROOT.std.vector( float )()
+#	      perfTree.Branch(str(makeCleanLabel(label,job_output))+"_weight",valueContainer[str(label)])
 	  pushJobOutput( label, job_output, SINGLE_DIR_DATA)
 
 	isFirstJob=False
     ###end log cycle
-    label="Error"
-    for err in SUMMARY[label].keys():
-      valueContainer[label].push_back(err)
-      valueContainer[label+"_weight"].push_back(float(SUMMARY[label][err]))
-
+    ###
+    
     ###the previous loop gathers the info and creates the tree structure
     ###this one actually fills the tree
     ###TODO: better if conditions
@@ -240,6 +237,15 @@ def getJobStatistics(LOGDIR,OUTFILE):
 	    valueContainer[label].push_back(entry)
       ###tree filling
       perfTree.Fill()
+    
+#    Still need to record errors:
+    label="Error"
+    for err in SUMMARY[label].keys():
+      print str(err)+" : "+str(SUMMARY[label][err])
+      for job in range(0,int(SUMMARY[label][err])):
+	valueContainer[label].clear()
+	valueContainer[label].push_back(float(err))
+	perfTree.Fill()
 
 #############################################3 something entirely new here -- the job info!
     gROOT.ProcessLine(
