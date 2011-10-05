@@ -105,8 +105,8 @@ float allcontributionsplot(TTree* events, TCut kBaseCut, TCut kMassCut, TCut kSi
 	
 	float obs=0;
 	float pred=0;
-	flag_this_change(__FUNCTION__,__LINE__,false);//PlottingSetup::RestrictToMassPeak
-	if(!PlottingSetup::RestrictToMassPeak) {
+	flag_this_change(__FUNCTION__,__LINE__,true);//PlottingSetup::RestrictToMassPeak
+	if(PlottingSetup::RestrictToMassPeak) {
 	  hname=GetNumericHistoName();
 	  TH1F* sbhossfp = new TH1F(hname.c_str(),hname.c_str(),1,-14000,14000);
 	  events->Draw(TString(mcjzbexpression)+">>"+TString(hname),kBaseCut&&kSidebandCut&&JZBPosCut&&cutOSSF,"goff");
@@ -198,12 +198,12 @@ void master_formula(std::vector<float> eff, float &errHi, float &errLo) {
 
 //________________________________________________________________________________________
 // Get normalization factor for the PDFs 
-float get_norm_pdf_factor(TTree *events, int k) {
+float get_norm_pdf_factor(TTree *events, int k, string addcut) {
 
   TH1F *haux = new TH1F("haux", "", 10000, 0, 5);
   char nameVar[20];
   sprintf(nameVar, "pdfW[%d]", k);
-  events->Project("haux", nameVar);
+  events->Project("haux", nameVar, addcut.c_str());
   float thisW = haux->Integral();
   events->Project("haux", "pdfW[0]");
   float normW = haux->Integral();
@@ -229,7 +229,7 @@ float pileup(TTree *events, bool requireZ, string informalname, string addcut=""
 	TCut kbase(PlottingSetup::genMassCut&&"genNjets>2&&genZPt>0"&&cutmass&&cutOSSF);
 	if(addcut!="") kbase=kbase&&addcut.c_str();//this is mostly for SUSY scans (adding requirements on masses)
 	
-	if(requireZ) kbase=kbase&&"TMath::Abs(genMID)==23";
+	if(requireZ&&PlottingSetup::RestrictToMassPeak) kbase=kbase&&"TMath::Abs(genMID)==23";
 	TH1F* hLM4 = plotEff(events,kbase,informalname);
 	hLM4->SetMinimum(0.);
 	
@@ -252,6 +252,7 @@ float pileup(TTree *events, bool requireZ, string informalname, string addcut=""
 //____________________________________________________________________________________
 // Effect of peak shifting
 void PeakError(TTree *events,float &result, string mcjzb, float peakerr,string addcut="") {
+  //Note: the cut used here is something like (JZBEXPRESSION+(peakerr)>50) without all the other cuts, to increase statistics (particularly for scans)
 	TString peakup("("+TString(mcjzb)+"+"+TString(any2string(TMath::Abs(peakerr)))+")"+geq_or_leq()+TString(any2string(jzbSel)));
 	TString peakdown("("+TString(mcjzb)+"-"+TString(any2string(TMath::Abs(peakerr)))+")"+geq_or_leq()+TString(any2string(jzbSel)));
 	TString peakcentral("("+TString(mcjzb)+")"+geq_or_leq()+TString(any2string(jzbSel)));
@@ -281,15 +282,15 @@ void PeakError(TTree *events,float &result, string mcjzb, float peakerr,string a
 	  else if(i==1) resdown=res;
 	  else if(i==2) resup=res;
 	}
-	if(TMath::Abs(rescent-resup)>TMath::Abs(rescent-resdown)) result=(TMath::Abs(rescent-resup)/rescent);
-	else result=(TMath::Abs(rescent-resdown)/rescent);
+	if(TMath::Abs(rescent-resup)>TMath::Abs(rescent-resdown)) result=(TMath::Abs(rescent-resup)/(float)rescent);
+	else result=(TMath::Abs(rescent-resdown)/(float)rescent);
 }
 
 //____________________________________________________________________________________
 // Total selection efficiency (MC)
 //returns the efficiency WITHOUT signal contamination, and the result and resulterr contain the result and the corresponding error
 Value MCefficiency(TTree *events,float &result, float &resulterr,string mcjzb,bool requireZ,int Neventsinfile, string addcut="", int k = 0) {
-	
+	write_warning(__FUNCTION__,"Setting automatized to off!"); automatized=false;
 	if(!events) {
 	  write_error(__FUNCTION__,"Tree passed for efficiency calculation is invalid!");
 	  return Value(0,0);
@@ -300,20 +301,20 @@ Value MCefficiency(TTree *events,float &result, float &resulterr,string mcjzb,bo
 	//TCut kbase("abs(genMll-91.2)<20&&genNjets>2&&genZPt>0&&genJZB"+geq_or_leq()+TString(jzbSelStr)+"&&genId1==-genId2");
 	TCut kbase("");
 	
-	flag_this_change(__FUNCTION__,__LINE__,false);//PlottingSetup::RestrictToMassPeak
+	flag_this_change(__FUNCTION__,__LINE__,true);//PlottingSetup::RestrictToMassPeak
 	if(requireZ&&PlottingSetup::RestrictToMassPeak) kbase=kbase&&"TMath::Abs(genMID)==23";
 	if(addcut!="") kbase=kbase&&addcut.c_str();//this is mostly for SUSY scans (adding requirements on masses)
 	// Corresponding reco. cuts
-	flag_this_change(__FUNCTION__,__LINE__,false);//PlottingSetup::RestrictToMassPeak
-	write_warning(__FUNCTION__,"There is a problem here ...");
-
-	TCut ksel;("pfJetGoodNum>2"&&cutmass&&"id1==id2&&"+TString(mcjzb)+geq_or_leq()+TString(jzbSelStr));
-	TCut ksel2;("pfJetGoodNum>2"&&cutmass&&"id1==id2&&"+TString(mcjzb)+ngeq_or_leq()+TString("-")+TString(jzbSelStr));
-	flag_this_change(__FUNCTION__,__LINE__,false);//PlottingSetup::RestrictToMassPeak
+	
+	flag_this_change(__FUNCTION__,__LINE__,true);//PlottingSetup::RestrictToMassPeak
+	TCut ksel;//("pfJetGoodNum>2"&&cutmass&&"id1==id2&&"+TString(mcjzb)+geq_or_leq()+TString(jzbSelStr));
+	TCut ksel2;//("pfJetGoodNum>2"&&cutmass&&"id1==id2&&"+TString(mcjzb)+ngeq_or_leq()+TString("-")+TString(jzbSelStr));
+	flag_this_change(__FUNCTION__,__LINE__,true);//PlottingSetup::RestrictToMassPeak
 	if(PlottingSetup::RestrictToMassPeak||!ConsiderSignalContaminationForLimits) {
 	  ksel=TCut("pfJetGoodNum>2"&&cutmass&&"id1==id2&&"+TString(mcjzb)+geq_or_leq()+TString(jzbSelStr));
 	  ksel2=TCut("pfJetGoodNum>2"&&cutmass&&"id1==id2&&"+TString(mcjzb)+ngeq_or_leq()+TString("-")+TString(jzbSelStr));
 	} else {
+	  //for off peak analysis we don't use the OSSF condition here yet so we can recycle these two cuts for the em condition!
 	  ksel=TCut("pfJetGoodNum>2"&&cutmass&&(TString(mcjzb)+geq_or_leq()+TString(jzbSelStr)));
 	  ksel2=TCut("pfJetGoodNum>2"&&cutmass&&(TString(mcjzb)+ngeq_or_leq()+TString("-")+TString(jzbSelStr)));
 	}
@@ -324,40 +325,39 @@ Value MCefficiency(TTree *events,float &result, float &resulterr,string mcjzb,bo
         string snegSide(negSide);
         char var[20];
         sprintf(var, "pdfW[%d]", k);
+	if(k==-1) sprintf(var,"1.0");//case in which we don't want to evaluate PDFs
         string svar(var);
         string newPosSide = "((id1==id2)&&(" + sposSide + "))*" + svar;
         string newNegSide = "((id1==id2)&&(" + snegSide + "))*" + svar;
-        string emnewPosSide = "((id1!=id2)&&(" + sposSide + "))*" + svar;
-        string emnewNegSide = "((id1!=id2)&&(" + snegSide + "))*" + svar;
+        string emnewPosSide = "((id1!=id2)&&(" + sposSide + "))*" + svar; // only used for off peak analysis
+        string emnewNegSide = "((id1!=id2)&&(" + snegSide + "))*" + svar; // only used for off peak analysis
 
 	TH1F *effh= new TH1F("effh","effh",1,-14000,14000);
         if(k>=0)events->Draw((mcjzbexpression+">>effh").c_str(), newPosSide.c_str(),"goff");
-	else events->Draw((mcjzbexpression+">>effh").c_str(), sposSide.c_str(),"goff");
+	else events->Draw((mcjzbexpression+">>effh").c_str(), (sposSide+"&&(id1==id2)").c_str(),"goff");//the OSSF condition is added for the offpeak analysis, in onpeak case it's there already but doesn't change anything.
 	Float_t sel = effh->Integral();
 	Float_t nsel=0;
 	
-	write_error(__FUNCTION__,"Need to adapt signal contamination for offpeak analysis!");
-	write_error(__FUNCTION__,"This requires intensive testing!");
+	///----------------------------------------------- THIS PART REQUIRES STUDYING! -------------------------
+	
 	if(ConsiderSignalContaminationForLimits) {
-	  flag_this_change(__FUNCTION__,__LINE__,false);//PlottingSetup::RestrictToMassPeak
+	  flag_this_change(__FUNCTION__,__LINE__,true);//PlottingSetup::RestrictToMassPeak
 	  if(PlottingSetup::RestrictToMassPeak) {
-	    if(k>=0)events->Draw((mcjzbexpression+">>effh").c_str(), newNegSide.c_str(),"goff");
-	    else events->Draw((mcjzbexpression+">>effh").c_str(), snegSide.c_str(),"goff");
-	    nsel = effh->Integral();
+	    events->Draw((mcjzbexpression+">>effh").c_str(), newNegSide.c_str(),"goff");
+	    nsel += effh->Integral();
 	  } else {
-	    if(k>=0)events->Draw((mcjzbexpression+">>effh").c_str(), newNegSide.c_str(),"goff");
-	    else events->Draw((mcjzbexpression+">>effh").c_str(), snegSide.c_str(),"goff");
-	    nsel = effh->Integral();
+	    events->Draw((mcjzbexpression+">>effh").c_str(), newNegSide.c_str(),"goff");
+	    nsel += effh->Integral();
 	    events->Draw((mcjzbexpression+">>effh").c_str(), emnewPosSide.c_str(),"goff");
 	    nsel += effh->Integral();
-	    events->Draw((mcjzbexpression+">>effh").c_str(), newNegSide.c_str(),"goff");
+	    events->Draw((mcjzbexpression+">>effh").c_str(), emnewNegSide.c_str(),"goff");
 	    nsel -= effh->Integral();
 	  }
 	}
 
         //Corrections due to normalization in the PDF. This has to be applied as well to the number of events in a file if the definition changes at some point.
         float normFactor = 1;
-	if(k>=0) get_norm_pdf_factor(events, k);
+	if(k>=0) get_norm_pdf_factor(events, k, addcut);
         sel = sel/normFactor;
         nsel = nsel/normFactor;
 
@@ -377,7 +377,7 @@ Value MCefficiency(TTree *events,float &result, float &resulterr,string mcjzb,bo
 	  result_wo_signalcont=Value(result,resulterr);
 	}
 	if(!automatized && k>0 ) dout << "PDF assessment: ";
-	if(!automatized) dout << "  MC efficiency: " << result << "+-" << resulterr << "  ( JZB>" << jzbSel << " : " << sel << " , JZB<-" << jzbSel << " : " << nsel << " and nevents=" << tot << ") with normFact=" << normFactor << std::endl;
+	if(!automatized) dout << "  MC efficiency: " << result << "+-" << resulterr << "  ( JZB>" << jzbSel << " : " << sel << " , signal contamination : " << nsel << " and nevents=" << tot << ") with normFact=" << normFactor << std::endl;
 	delete effh;
 	return result_wo_signalcont;
 }
@@ -401,7 +401,7 @@ vector<float> processMCefficiency(TTree *events,string mcjzb,bool requireZ,int N
 void JZBefficiency(TTree *events, string informalname, float &jzbeff, float &jzbefferr, bool requireZ, string addcut="") {
 	TCut kbase(genMassCut&&"genNjets>2&&genZPt>0"&&cutmass&&cutOSSF);
 	if(addcut!="") kbase=kbase&&addcut.c_str();//this is mostly for SUSY scans (adding requirements on masses)
-	if(requireZ) kbase=kbase&&"TMath::Abs(genMID)==23";
+	if(requireZ&&PlottingSetup::RestrictToMassPeak) kbase=kbase&&"TMath::Abs(genMID)==23";
 	TH1F* hLM4 = plotEff(events,kbase,informalname);
 	Int_t bin = hLM4->FindBin(jzbSel); // To get the error
 	jzbeff=Interpolate(jzbSel,hLM4);
@@ -484,7 +484,7 @@ void JZBresponse(TTree *events, bool requireZ, float &resp, float &resperr, stri
 	TCut kbase(genMassCut&&"genZPt>0&&genNjets>2");
 	if(addcut!="") kbase=kbase&&addcut.c_str();//this is mostly for SUSY scans (adding requirements on masses)
 	flag_this_change(__FUNCTION__,__LINE__,false);//PlottingSetup::RestrictToMassPeak
-	if(requireZ) kbase=kbase&&"TMath::Abs(genMID)==23";
+	if(requireZ&&PlottingSetup::RestrictToMassPeak) kbase=kbase&&"TMath::Abs(genMID)==23";
 	flag_this_change(__FUNCTION__,__LINE__,false);//PlottingSetup::RestrictToMassPeak
 	TCut ksel(cutmass&&cutOSSF);
 	
@@ -554,7 +554,6 @@ void do_systematics_for_one_file(TTree *events,int Neventsinfile,string informal
   if(!automatized) dout << "MC efficiencies:" << endl;
   Value mceff_nosigcont = MCefficiency(events,mceff,mcefferr,mcjzb,requireZ,Neventsinfile,addcut,-1);
   if(!automatized) cout << "   Without signal contamination, we find an efficiency of " << mceff_nosigcont << endl;
-
   if(PlottingSetup::computeJZBefficiency) JZBefficiency(events,informalname,jzbeff,jzbefferr,requireZ,addcut);
   if(!automatized) dout << "JZB efficiency: " << jzbeff << "+/-" << jzbefferr << endl;
   
