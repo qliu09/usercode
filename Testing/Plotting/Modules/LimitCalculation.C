@@ -453,10 +453,10 @@ void limit_shapes_for_systematic_effect(TFile *limfile, string identifier, strin
     signalname="signal_"+identifier;
   }
   
-  TH1F *obs = (TH1F*)ZOSSFP->Clone();
+  TH1F *obs = (TH1F*)ZOSSFP->Clone("observation");
   obs->SetName(obsname.c_str());
   obs->Write();
-  TH1F *pred = (TH1F*)ZOSSFN->Clone();
+  TH1F *pred = (TH1F*)ZOSSFN->Clone("prediction");
     flag_this_change(__FUNCTION__,__LINE__,false);//PlottingSetup::RestrictToMassPeak
   if(PlottingSetup::RestrictToMassPeak) {
     pred->Add(ZOSOFP,1.0/3);
@@ -506,20 +506,24 @@ void limit_shapes_for_systematic_effect(TFile *limfile, string identifier, strin
   delete ZOSSFN;
   delete ZOSOFN;
   
-  delete SBOSSFP;
-  delete SBOSOFP;
-  delete SBOSSFN;
-  delete SBOSOFN;
+  if(PlottingSetup::RestrictToMassPeak) {
+    delete SBOSSFP;
+    delete SBOSOFP;
+    delete SBOSSFN;
+    delete SBOSOFN;
+  }
   
   delete LZOSSFP;
   delete LZOSOFP;
   delete LZOSSFN;
   delete LZOSOFN;
   
-  delete LSBOSSFP;
-  delete LSBOSOFP;
-  delete LSBOSSFN;
-  delete LSBOSOFN;
+  if(PlottingSetup::RestrictToMassPeak) {
+    delete LSBOSSFP;
+    delete LSBOSOFP;
+    delete LSBOSSFN;
+    delete LSBOSOFN;
+  }
 
 }
 
