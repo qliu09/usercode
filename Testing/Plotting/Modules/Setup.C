@@ -18,7 +18,7 @@ namespace PlottingSetup {
   
   bool RestrictToMassPeak=false; //if you want to switch between offpeak ("false") and onpeak ("true") analysis please use this switch; the masscut below will be adapted automatically when adding samples :-)
   
-  float luminosity=2809;//1936;//751.0;//486.0;//468.0//336.;//pb^{-1}
+  float luminosity=2809.994;//1936;//751.0;//486.0;//468.0//336.;//pb^{-1}
   float lumiuncert=0.045;// to be indicated in [0,1] range, e.g. for 4% write 0.04
 
   string jzbvariabledata="jzb[1]+0.06*pt";
