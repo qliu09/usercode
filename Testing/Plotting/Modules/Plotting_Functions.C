@@ -292,6 +292,11 @@ void make_comp_plot( string var, string xlabel, string filename, float jzbcut, s
   TCut kRegions[] = { cutOSSF&&cutnJets&&cutmass,     cutOSOF&&cutnJets&&cutmass,
                       cutOSSF&&cutnJets&&sidebandcut, cutOSOF&&cutnJets&&sidebandcut };
   
+  //find ymax
+  TH1F *Refdatahisto = allsamples.Draw("datahisto",   var,nbins,xmin,xmax,xlabel,"events",kRegions[0]&&jzbData[0],data,luminosity);
+  ymax=int((Refdatahisto->GetMaximum()+2*TMath::Sqrt(Refdatahisto->GetMaximum()))*1.2+0.5);
+  delete Refdatahisto;
+		      
   for ( int iregion=0; iregion<nRegions; ++iregion ) 
     for ( int ijzb=0; ijzb<2; ++ijzb ) {
       TCanvas *ccomp = new TCanvas("ccomp","Comparison plot",600,400);
@@ -327,21 +332,26 @@ void make_comp_plot( string var, string xlabel, string filename, float jzbcut, s
 }
 
 
-void region_comparison_plots(string mcjzb, string datajzb) {
+void region_comparison_plots(string mcjzb, string datajzb, vector<float> jzb_cuts) {
   dout << "Creating comparison plots for signal and control regions" << endl;
   // Compare a few quantities in the signal region and all 7 control regions
 
   switch_overunderflow(true);  // switching overflow/underflow bins on
     
-  float jzbcut=100; // Comparison plots are done for this JZB cut
-
-flag_this_change(__FUNCTION__,__LINE__,true);//PlottingSetup::RestrictToMassPeak ---- the arguments changed
-  make_comp_plot("met[4]","pfMET [GeV]","pfmet",jzbcut,mcjzb,datajzb,18,0,360,false,0,16.);
-  make_comp_plot("pfJetGoodNum","#(jets)","njets",jzbcut,mcjzb,datajzb,10,0,10, false,0,35.);
-  make_comp_plot("pt","Z p_{T} [GeV]","Zpt",jzbcut,mcjzb,datajzb,26,0,525,false,0.,21.);
-  make_comp_plot("numVtx","#(prim. vertices)","nvtx",jzbcut,mcjzb,datajzb,20,0.,20.,false,0,16.);
-  make_comp_plot("TMath::Abs(dphi)","#Delta#phi(leptons)","dphilep",jzbcut,mcjzb,datajzb,10,0.,3.1415,false,0,16.,true);
-  make_comp_plot("TMath::Abs(dphi_sumJetVSZ[1])","#Delta#phi(Z,jets)","dphiZjets",jzbcut,mcjzb,datajzb,10,0.,3.1415,false,0,16.,true);
+  
+    flag_this_change(__FUNCTION__,__LINE__,true);//PlottingSetup::RestrictToMassPeak ---- the arguments changed
+  for(int ijzb=0;ijzb<jzb_cuts.size();ijzb++) {
+    float jzbcut=jzb_cuts[ijzb]; // Comparison plots are done for this JZB cut
+    float mll_low=50;float mll_high=170;
+    if(!PlottingSetup::RestrictToMassPeak) mll_high=200;
+    make_comp_plot("mll","m_{ll} [GeV]","mll",jzbcut,mcjzb,datajzb,30,mll_low,mll_high,false,0,16.);
+    make_comp_plot("met[4]","pfMET [GeV]","pfmet",jzbcut,mcjzb,datajzb,18,0,360,false,0,16.);
+    make_comp_plot("pfJetGoodNum","#(jets)","njets",jzbcut,mcjzb,datajzb,10,0,10, false,0,35.);
+    make_comp_plot("pt","Z p_{T} [GeV]","Zpt",jzbcut,mcjzb,datajzb,26,0,525,false,0.,21.);
+    make_comp_plot("numVtx","#(prim. vertices)","nvtx",jzbcut,mcjzb,datajzb,20,0.,20.,false,0,16.);
+    make_comp_plot("TMath::Abs(dphi)","#Delta#phi(leptons)","dphilep",jzbcut,mcjzb,datajzb,10,0.,3.1415,false,0,16.,true);
+    make_comp_plot("TMath::Abs(dphi_sumJetVSZ[1])","#Delta#phi(Z,jets)","dphiZjets",jzbcut,mcjzb,datajzb,10,0.,3.1415,false,0,16.,true);
+  }
 
   switch_overunderflow(false); // switching overflow/underflow bins off
 }
