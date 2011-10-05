@@ -20,7 +20,6 @@ using namespace std;
 using namespace PlottingSetup;
 
 void fill_result_histos(float &zossfp, float &zossfperr, float &zosofp, float &zossfn, float &zosofn, float &sbossfp, float &sbosofp, float &sbossfn, float &sbosofn,string datajzb,float cut, float cuthigh, int mcordata, float &result, vector<int> sel, samplecollection &sampleC, string addcut="") {
-  if(!RestrictToMassPeak) write_warning(__FUNCTION__,"Watch out, once we go offpeak this function needs rewriting!");
   string xlabel="JZB [GeV] -- for algoritm internal use only!";
   bool dosignal=false;
   if(mcordata==mcwithsignal) {
@@ -46,7 +45,7 @@ void fill_result_histos(float &zossfp, float &zossfperr, float &zosofp, float &z
     ZOSSFN = sampleC.Draw("ZOSSFN","-"+datajzb,1,cut,cuthigh, xlabel, "events",cutmass&&cutOSSF&&cutnJets&&basiccutplus,mcordata,luminosity,dosignal);
     ZOSOFN = sampleC.Draw("ZOSOFN","-"+datajzb,1,cut,cuthigh, xlabel, "events",cutmass&&cutOSOF&&cutnJets&&basiccutplus,mcordata,luminosity,dosignal);
     
-    flag_this_change(__FUNCTION__,__LINE__,false);//PlottingSetup::RestrictToMassPeak
+    flag_this_change(__FUNCTION__,__LINE__,true);//PlottingSetup::RestrictToMassPeak
     if(PlottingSetup::RestrictToMassPeak) {
       SBOSSFP = sampleC.Draw("SBOSSFP",datajzb,1,cut,cuthigh, xlabel, "events",cutOSSF&&cutnJets&&basiccutplus&&sidebandcut,mcordata,luminosity,dosignal);
       SBOSOFP = sampleC.Draw("SBOSOFP",datajzb,1,cut,cuthigh, xlabel, "events",cutOSOF&&cutnJets&&basiccutplus&&sidebandcut,mcordata,luminosity,dosignal);
@@ -60,7 +59,7 @@ void fill_result_histos(float &zossfp, float &zossfperr, float &zosofp, float &z
     ZOSSFN = sampleC.Draw("ZOSSFN","-"+datajzb,1,cut,cuthigh, xlabel, "events",cutmass&&cutOSSF&&cutnJets&&basiccutplus,mcordata,luminosity,sel);
     ZOSOFN = sampleC.Draw("ZOSOFN","-"+datajzb,1,cut,cuthigh, xlabel, "events",cutmass&&cutOSOF&&cutnJets&&basiccutplus,mcordata,luminosity,sel);
     
-    flag_this_change(__FUNCTION__,__LINE__,false);//PlottingSetup::RestrictToMassPeak
+    flag_this_change(__FUNCTION__,__LINE__,true);//PlottingSetup::RestrictToMassPeak
     if(PlottingSetup::RestrictToMassPeak) {
       SBOSSFP = sampleC.Draw("SBOSSFP",datajzb,1,cut,cuthigh, xlabel, "events",cutOSSF&&cutnJets&&basiccutplus&&sidebandcut,mcordata,luminosity,sel);
       SBOSOFP = sampleC.Draw("SBOSOFP",datajzb,1,cut,cuthigh, xlabel, "events",cutOSOF&&cutnJets&&basiccutplus&&sidebandcut,mcordata,luminosity,sel);
@@ -76,7 +75,7 @@ void fill_result_histos(float &zossfp, float &zossfperr, float &zosofp, float &z
   zossfn=ZOSSFN->Integral();
   zosofn=ZOSOFN->Integral();
   
-  flag_this_change(__FUNCTION__,__LINE__,false);//PlottingSetup::RestrictToMassPeak
+  flag_this_change(__FUNCTION__,__LINE__,true);//PlottingSetup::RestrictToMassPeak
   if(PlottingSetup::RestrictToMassPeak) {
     sbossfp=SBOSSFP->Integral();
     sbosofp=SBOSOFP->Integral();
@@ -203,7 +202,6 @@ void get_result_above_one_fixed_jzb_value(float cut ,string mcjzb,string datajzb
 }
 */
 vector<float> get_result_between_two_fixed_jzb_values(float cut , float cuthigh, string mcjzb,string datajzb, int mcordata,float jzbpeakerrorMC, float jzbpeakerrorData, TCanvas *rescan, bool chatty=false, bool dopoisson=false, bool writeanything=true) {
-  if(!RestrictToMassPeak) write_warning(__FUNCTION__,"Watch out, once we go offpeak this function needs rewriting!");
 /*return vector of floats
   [0] Bpred [1] Bpred uncert [2] Observed [3] Observed error
   // if we use this for the ratio plot we don't want to see any of the results (hence writeanything=false)
@@ -245,7 +243,7 @@ vector<float> get_result_between_two_fixed_jzb_values(float cut , float cuthigh,
   float emsidebanduncert=0.5;
   float eemmsidebanduncert=0.5;
   syserr = (zjetsestimateuncert*zossfn)*(zjetsestimateuncert*zossfn);//first term
-  flag_this_change(__FUNCTION__,__LINE__,false);//PlottingSetup::RestrictToMassPeak
+  flag_this_change(__FUNCTION__,__LINE__,true);//PlottingSetup::RestrictToMassPeak
   if(PlottingSetup::RestrictToMassPeak) {
     syserr+= ((zosofp)*(zosofp) + (zosofn)*(zosofn))*(1.0/9)*emuncert*emuncert;//sys err from emu method
     syserr+= ((sbossfp)*(sbossfp)+(sbossfn)*(sbossfn))*(1.0/9)*eemmsidebanduncert*eemmsidebanduncert; // sys err from eemm sidebands
@@ -256,7 +254,7 @@ vector<float> get_result_between_two_fixed_jzb_values(float cut , float cuthigh,
     
   syserr=TMath::Sqrt(syserr);
   
-  flag_this_change(__FUNCTION__,__LINE__,false);//PlottingSetup::RestrictToMassPeak
+  flag_this_change(__FUNCTION__,__LINE__,true);//PlottingSetup::RestrictToMassPeak
   if(PlottingSetup::RestrictToMassPeak) {
     staterr=TMath::Sqrt(zossfn + (1.0/9)*(zosofp+zosofn)+ (1.0/9)*(sbossfp+sbossfn)+ (1.0/9)*(sbosofp+sbosofn));
   } else {
@@ -277,7 +275,7 @@ vector<float> get_result_between_two_fixed_jzb_values(float cut , float cuthigh,
     if(mcordata==mc) dout << "    MC :: ";
     if(mcordata==mcwithsignal) dout << "    MC with S :: ";
     if(mcordata==data) dout << "   ";
-    flag_this_change(__FUNCTION__,__LINE__,false);//PlottingSetup::RestrictToMassPeak
+    flag_this_change(__FUNCTION__,__LINE__,true);//PlottingSetup::RestrictToMassPeak
     if(PlottingSetup::RestrictToMassPeak) {
       dout << "Predicted: " << zossfn << " + (1/3)*(" << zosofp << "-" << zosofn<<") [e&mu]+ (1/3)*(" << sbossfp << "-" << sbossfn<<") [SF,SB]+ (1/3)*(" << sbosofp << "-" << sbosofn<<") [OF,SB] = ";
       dout << zossfn + (1.0/3)*(zosofp-zosofn)+ (1.0/3)*(sbossfp-sbossfn)+ (1.0/3)*(sbosofp-sbosofn)<< " +/- " << peakerr << " (peak ) " << " +/- " << syserr << " (sys) +/- " << staterr << " (stat)" << endl;
@@ -290,7 +288,7 @@ vector<float> get_result_between_two_fixed_jzb_values(float cut , float cuthigh,
     
     
     if(mcordata==data) {
-    flag_this_change(__FUNCTION__,__LINE__,false);//PlottingSetup::RestrictToMassPeak
+    flag_this_change(__FUNCTION__,__LINE__,true);//PlottingSetup::RestrictToMassPeak
     if(PlottingSetup::RestrictToMassPeak) {
 	dout << "      Composition:  (ee)" << zossfnee << " + (1/3)*(" << e_to_emu*zosofp << "-" << e_to_emu*zosofn<<") ["<<e_to_emu<<"*e&mu]+ (1/3)*(" << sbossfpee << "-" << sbossfnee<<") [SF,SB]+ (1/3)*(" << sbosofp*e_to_emu << "-" << sbosofn*e_to_emu<<") ["<<e_to_emu<<"*OF,SB] = ";
 	dout << zossfnee + (1.0/3)*(e_to_emu*zosofp-e_to_emu*zosofn)+ (1.0/3)*(sbossfpee-sbossfnee) + (1.0/3)*(sbosofp*e_to_emu - sbosofn*e_to_emu) << endl;
@@ -329,7 +327,7 @@ vector<float> get_result_between_two_fixed_jzb_values(float cut , float cuthigh,
     Nprederr.push_back(totprederr);
   }
   vector<float> resultvector;
-  flag_this_change(__FUNCTION__,__LINE__,false);//PlottingSetup::RestrictToMassPeak
+  flag_this_change(__FUNCTION__,__LINE__,true);//PlottingSetup::RestrictToMassPeak
   if(PlottingSetup::RestrictToMassPeak) resultvector.push_back(zossfn + (1.0/3)*(zosofp-zosofn)+ (1.0/3)*(sbossfp-sbossfn)+ (1.0/3)*(sbosofp-sbosofn));
   else resultvector.push_back(zossfn + (zosofp-zosofn));
   
