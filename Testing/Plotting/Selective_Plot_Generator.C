@@ -239,6 +239,19 @@ int main (int argc, char ** argv)
   ratio_binning.push_back(350);
   //ratio_binning.push_back(500);
 
+  //these are the JZB cuts defining our search regions
+  vector<float> jzb_cut; //starting where, please?
+  jzb_cut.push_back(50);
+  write_warning(__FUNCTION__,"ONLY ONE SIGNAL REGION IS ACTIVE!");
+//  jzb_cut.push_back(75);
+//  jzb_cut.push_back(100);
+//  jzb_cut.push_back(125);
+//  jzb_cut.push_back(150);
+//  jzb_cut.push_back(175);
+//  jzb_cut.push_back(200);
+//  jzb_cut.push_back(225);
+//  jzb_cut.push_back(250);
+  
   //**** part 2 : kinematic plots
   if(do_kinematic_variables||do_all) do_kinematic_plots();
   if(do_kinematic_PF_variables) do_kinematic_PF_plots();
@@ -247,7 +260,7 @@ int main (int argc, char ** argv)
   if(do_lepton_comparison||do_all) lepton_comparison_plots();
 
   //**** part 3b: comparison between control regions (SFZPJZBPOS,SFZPJZBNEG,...)
-  if (do_region_comparison||do_all) region_comparison_plots(mcjzb.str(),datajzb.str());
+  if (do_region_comparison||do_all) region_comparison_plots(mcjzb.str(),datajzb.str(),jzb_cut);
 
   //**** part 4: JZB plots (OSOF, OSSF) 
   if(do_jzb_plots||do_all) jzb_plots(mcjzb.str(),datajzb.str(),ratio_binning);
@@ -263,17 +276,6 @@ int main (int argc, char ** argv)
   if(do_zjets_comparison||do_all) zjets_prediction_comparison(mcjzb.str());
   
   //**** part 8: observed and predicted!
-  vector<float> jzb_cut; //starting where, please?
-  jzb_cut.push_back(50);
-//  jzb_cut.push_back(75);
-  jzb_cut.push_back(100);
-//  jzb_cut.push_back(125);
-  jzb_cut.push_back(150);
-//  jzb_cut.push_back(175);
-  jzb_cut.push_back(200);
-//  jzb_cut.push_back(225);
-//  jzb_cut.push_back(250);
-  
 //  if(calculate_pred_and_observed||do_all) calculate_predicted_and_observed_eemm(MCPeak,MCPeakError,DataPeak,DataPeakError,jzb_cut);
   
   if(do_all||get_new_results) doquick=false;

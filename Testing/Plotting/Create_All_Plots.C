@@ -131,6 +131,7 @@ int main(int narg, char *argv[])
   dout << "    Data : " << datajzb.str() << endl;
   dout << "    MC : " << mcjzb.str() << endl;
   
+  //This is the binning we'll use for ratio plots
   vector<float> ratio_binning; 
   ratio_binning.push_back(0);
   ratio_binning.push_back(5);
@@ -142,6 +143,18 @@ int main(int narg, char *argv[])
   ratio_binning.push_back(350);
   //ratio_binning.push_back(500);
 
+  //these are the JZB cuts defining our search regions
+  vector<float> jzb_cut;
+  jzb_cut.push_back(50);
+//  jzb_cut.push_back(75);
+  jzb_cut.push_back(100);
+//  jzb_cut.push_back(125);
+  jzb_cut.push_back(150);
+//  jzb_cut.push_back(175);
+  jzb_cut.push_back(200);
+//  jzb_cut.push_back(225);
+//  jzb_cut.push_back(250);
+
   //**** part 2 : kinematic plots
   if(do_kinematic_variables||do_all) do_kinematic_plots();
   if(do_kinematic_PF_variables) do_kinematic_PF_plots();
@@ -150,7 +163,7 @@ int main(int narg, char *argv[])
   if(do_lepton_comparison||do_all) lepton_comparison_plots();
 
   //**** part 3b: comparison between control regions (SFZPJZBPOS,SFZPJZBNEG,...)
-  if (do_region_comparison||do_all) region_comparison_plots(mcjzb.str(),datajzb.str());
+  if (do_region_comparison||do_all) region_comparison_plots(mcjzb.str(),datajzb.str(),jzb_cut);
 
   //**** part 4: JZB plots (OSOF, OSSF) 
   if(do_jzb_plots||do_all) jzb_plots(mcjzb.str(),datajzb.str(),ratio_binning);
@@ -164,21 +177,10 @@ int main(int narg, char *argv[])
   if(do_signal_bg_comparison_plot||do_all) signal_bg_comparison();
   if(do_ttbar_comparison||do_all) ttbar_sidebands_comparison(mcjzb.str(),ratio_binning);
   if(do_zjets_comparison||do_all) zjets_prediction_comparison(mcjzb.str());
-  
-  //**** part 8: observed and predicted!
-  vector<float> jzb_cut; //starting where, please?
-  jzb_cut.push_back(50);
-//  jzb_cut.push_back(75);
-  jzb_cut.push_back(100);
-//  jzb_cut.push_back(125);
-  jzb_cut.push_back(150);
-//  jzb_cut.push_back(175);
-  jzb_cut.push_back(200);
-//  jzb_cut.push_back(225);
-//  jzb_cut.push_back(250);
-  
+    
 //  if(calculate_pred_and_observed||do_all) calculate_predicted_and_observed_eemm(MCPeak,MCPeakError,DataPeak,DataPeakError,jzb_cut);
   
+    //**** part 8: observed and predicted!
   if(do_all||get_new_results) doquick=false;
   if(do_all||do_save_template||do_compute_upper_limits_from_counting_experiment||do_model_scan||get_new_results) get_result(mcjzb.str(),datajzb.str(),DataPeakError,MCPeakError,jzb_cut,verbose,dopoisson,doquick);
   
@@ -230,15 +232,18 @@ int main(int narg, char *argv[])
     dout << "Predicted (emu, JZB>100) OSOF" << endl;
     pick_up_events((const char*)(cutmass&&cutOSOF&&cutnJets&&basiccut&&"((jzb[1]+0.06*pt-2.84727)>100)"));
     dout << "Predicted (emu, JZB<-100) OSOF" << endl;
-    pick_up_events((const char*)(cutmass&&cutOSOF&&cutnJets&&basiccut&&"((jzb[1]+0.06*pt-2.84727)<-100)"));
-    dout << "Predicted (SB SF, JZB>100) OSSF" << endl;
-    pick_up_events((const char*)(sidebandcut&&cutOSSF&&cutnJets&&basiccut&&"((jzb[1]+0.06*pt-2.84727)>100)"));
-    dout << "Predicted (SB SF, JZB<-100) OSSF" << endl;
-    pick_up_events((const char*)(sidebandcut&&cutOSSF&&cutnJets&&basiccut&&"((jzb[1]+0.06*pt-2.84727)<-100)"));
-    dout << "Predicted (SB emu, JZB>100) OSOF" << endl;
-    pick_up_events((const char*)(sidebandcut&&cutOSOF&&cutnJets&&basiccut&&"((jzb[1]+0.06*pt-2.84727)>100)"));
-    dout << "Predicted (SB emu, JZB<-100) OSOF" << endl;
-    pick_up_events((const char*)(cutOSOF&&cutnJets&&basiccut&&sidebandcut&&"((jzb[1]+0.06*pt-2.84727)<-100)"));
+    
+    if(PlottingSetup::RestrictToMassPeak) {
+      pick_up_events((const char*)(cutmass&&cutOSOF&&cutnJets&&basiccut&&"((jzb[1]+0.06*pt-2.84727)<-100)"));
+      dout << "Predicted (SB SF, JZB>100) OSSF" << endl;
+      pick_up_events((const char*)(sidebandcut&&cutOSSF&&cutnJets&&basiccut&&"((jzb[1]+0.06*pt-2.84727)>100)"));
+      dout << "Predicted (SB SF, JZB<-100) OSSF" << endl;
+      pick_up_events((const char*)(sidebandcut&&cutOSSF&&cutnJets&&basiccut&&"((jzb[1]+0.06*pt-2.84727)<-100)"));
+      dout << "Predicted (SB emu, JZB>100) OSOF" << endl;
+      pick_up_events((const char*)(sidebandcut&&cutOSOF&&cutnJets&&basiccut&&"((jzb[1]+0.06*pt-2.84727)>100)"));
+      dout << "Predicted (SB emu, JZB<-100) OSOF" << endl;
+      pick_up_events((const char*)(cutOSOF&&cutnJets&&basiccut&&sidebandcut&&"((jzb[1]+0.06*pt-2.84727)<-100)"));
+    }
   }
 
   if(do_save_template) save_template(mcjzb.str(),datajzb.str(),jzb_cut,MCPeakError);
