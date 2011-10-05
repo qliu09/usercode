@@ -1182,7 +1182,7 @@ TCanvas* draw_ratio_on_canvas(TH1F *nominator, TH1F *denominator, TVirtualPad *c
   
   float xstretchfactor=((1-ratiospace)*(1-gStyle->GetPadTopMargin()))/((1)*ratiospace);
   
-  TH1F *ratio = (TH1F*)nominator->Clone("ratio");///------------------- get random histo name here!
+  TH1F *ratio = (TH1F*)nominator->Clone(GetNumericHistoName().c_str());
   ratio->Divide(denominator);
   ratio->SetTitle("");
   ratio->GetYaxis()->SetRangeUser(0.5,1.5);
