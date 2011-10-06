@@ -225,7 +225,7 @@ float pileup(TTree *events, bool requireZ, string informalname, string addcut=""
 	jzbMax = myJzbMax;
 	
 	// Acceptance cuts
-	flag_this_change(__FUNCTION__,__LINE__,false);//PlottingSetup::RestrictToMassPeak
+	flag_this_change(__FUNCTION__,__LINE__,true);//PlottingSetup::RestrictToMassPeak
 	TCut kbase(PlottingSetup::genMassCut&&"genNjets>2&&genZPt>0"&&cutmass&&cutOSSF);
 	if(addcut!="") kbase=kbase&&addcut.c_str();//this is mostly for SUSY scans (adding requirements on masses)
 	
@@ -293,6 +293,8 @@ Value MCefficiency(TTree *events,float &result, float &resulterr,string mcjzb,bo
 	write_warning(__FUNCTION__,"Setting automatized to off!"); automatized=false;
 	if(!events) {
 	  write_error(__FUNCTION__,"Tree passed for efficiency calculation is invalid!");
+	  result=0;
+	  resulterr=0;
 	  return Value(0,0);
 	}
 	
@@ -415,7 +417,7 @@ void JZBefficiency(TTree *events, string informalname, float &jzbeff, float &jzb
 void JZBjetScale(TTree *events, float &jesdown, float &jesup, string informalname,bool requireZ,string addcut="",float syst=0.1, Float_t jzbSelection=-1, TString plotName = "" ) {
 	TCut kbase(genMassCut&&"genZPt>0");
 	if(addcut!="") kbase=kbase&&addcut.c_str();//this is mostly for SUSY scans (adding requirements on masses)
-	flag_this_change(__FUNCTION__,__LINE__,false);//PlottingSetup::RestrictToMassPeak
+	flag_this_change(__FUNCTION__,__LINE__,true);//PlottingSetup::RestrictToMassPeak
 	if(requireZ&&PlottingSetup::RestrictToMassPeak) kbase=kbase&&"TMath::Abs(genMID)==23";
 
 	TCut ksel(cutmass&&cutOSSF);
@@ -454,7 +456,7 @@ void doJZBscale(TTree *events, float &down, float &up, float &syst, float system
 	
 	TCut kbase(genMassCut&&"genZPt>0&&genNjets>2");
 	if(addcut!="") kbase=kbase&&addcut.c_str();//this is mostly for SUSY scans (adding requirements on masses)
-	flag_this_change(__FUNCTION__,__LINE__,false);//PlottingSetup::RestrictToMassPeak
+	flag_this_change(__FUNCTION__,__LINE__,true);//PlottingSetup::RestrictToMassPeak
 	if(requireZ&&PlottingSetup::RestrictToMassPeak) kbase=kbase&&"TMath::Abs(genMID)==23";
 	TCut ksel(cutmass&&cutOSSF);
 	
