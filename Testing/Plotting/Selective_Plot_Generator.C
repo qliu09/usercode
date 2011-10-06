@@ -242,13 +242,12 @@ int main (int argc, char ** argv)
   //these are the JZB cuts defining our search regions
   vector<float> jzb_cut; //starting where, please?
   jzb_cut.push_back(50);
-  write_warning(__FUNCTION__,"ONLY ONE SIGNAL REGION IS ACTIVE!");
 //  jzb_cut.push_back(75);
-//  jzb_cut.push_back(100);
+  jzb_cut.push_back(100);
 //  jzb_cut.push_back(125);
-//  jzb_cut.push_back(150);
+  jzb_cut.push_back(150);
 //  jzb_cut.push_back(175);
-//  jzb_cut.push_back(200);
+  jzb_cut.push_back(200);
 //  jzb_cut.push_back(225);
 //  jzb_cut.push_back(250);
   
@@ -343,6 +342,9 @@ int main (int argc, char ** argv)
   if(do_save_template) save_template(mcjzb.str(),datajzb.str(),jzb_cut,MCPeakError);
   
   if(do_test) test();
+  
+  
+  write_warning(__FUNCTION__,"Watch out, I've deactivated the modification warnings to see the forrest again and not the trees! (allusion to German idiom...)");
   
   return 0;  
 }
