@@ -1160,10 +1160,13 @@ void process_mem_usage(double& vm_usage, double& resident_set)
 
 void flag_this_change(string function, int line, int checked=0) {
   stringstream peakmodificationwarning;
-  if(checked) peakmodificationwarning << "There's been a change on line " << line << " in function " << function << " that affects the functionality you're using. This modification has already been checked. Please produce the corresponding plot manually and then mark this as done (i.e. flag_this_change(..,..,2)";
-  else peakmodificationwarning  << "There's been a change on line " << line << " in function " << function << " that affects the functionality you're using. If you've checked that it works well please change the function call to flag_this_change(..,..,true) so this will only be an info instead of a warning :-) ";
+  if(checked==0) peakmodificationwarning  << "There's been a change on line " << line << " in function " << function << " that affects the functionality you're using. If you've checked that it works well please change the function call to flag_this_change(..,..,true) so this will only be an info instead of a warning :-) ";
+  if(checked==1) peakmodificationwarning << "There's been a change on line " << line << " in function " << function << " that affects the functionality you're using. This modification has already been checked. Please produce the corresponding plot manually and then mark this as done (i.e. flag_this_change(..,..,2)";
+  if(checked==2) peakmodificationwarning << "Xchecked: There's been a change on line " << line << " in function " << function << " that affects the functionality you're using. This modification has been checked and crosschecked.";
+  
+  
   if(checked==0) write_warning(function,peakmodificationwarning.str());
-  if(checked==1) write_info(function,peakmodificationwarning.str());
+//  if(checked==1) write_info(function,peakmodificationwarning.str());
   peakmodificationwarning << " This modification has been checked and the changes have been reproduced. Checks completed.";
   if(checked==2) write_info(function,peakmodificationwarning.str());
 }
@@ -1225,7 +1228,7 @@ TCanvas* draw_ratio_on_canvas(TH1F *nominator, TH1F *denominator, TVirtualPad *c
 //  ratio->SetFillColor(TColor::GetColor("#CEECF5"));
   ratio->SetFillColor(TColor::GetColor("#58D3F7"));
   ratio->SetMarkerSize(0);
-  ratio->Draw("e3");
+  ratio->Draw("e4");
   TLine *oneline = new TLine(ratio->GetXaxis()->GetBinLowEdge(1),1,ratio->GetXaxis()->GetBinLowEdge(ratio->GetNbinsX())+ratio->GetXaxis()->GetBinWidth(ratio->GetNbinsX()),1);
   oneline->SetLineStyle(2);
   oneline->SetLineColor(kBlue);
