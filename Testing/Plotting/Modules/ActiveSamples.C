@@ -49,8 +49,8 @@ void define_SMS_sample(bool showList, samplecollection &allsamples, samplecollec
     if((int)((string)hostname).find("falda")>-1) prefix="/scratch/";
     
       /// NEW: Only indicate the very first file - please place scans in ntuples/SMS/ and adapt the name here and in SUSYScan.C (the files are loaded when needed avoiding high memory usage and startup times)
-//	scansample.AddSample("/shome/buchmann/ntuples/mSUGRA/mSUGRA_clean_splitup_0_0.root","mSUGRA",1,1,false,true,0,kRed); // there is only one sample in the scan; we give each event weight "1"
-	scansample.AddSample(prefix+"buchmann/ntuples/SMS/SMS_clean_splitup_0_0.root","SMS",1,1,false,true,0,kRed); // there is only one sample in the scan; we give each event weight "1"
+	scansample.AddSample(prefix+"buchmann/ntuples/mSUGRA/mSUGRA_clean_splitup_0_0.root","mSUGRA",1,1,false,true,0,kRed); // there is only one sample in the scan; we give each event weight "1"
+//	scansample.AddSample(prefix+"buchmann/ntuples/SMS/SMS_clean_splitup_0_0.root","SMS",1,1,false,true,0,kRed); // there is only one sample in the scan; we give each event weight "1"
 
     if(loadall) {
       for(int ix=0;ix<PlottingSetup::ScanXzones;ix++) {
