@@ -88,6 +88,16 @@ sample::sample(string m_filename, string m_samplename, long m_Nentries, float m_
     gErrorIgnoreLevel=currlevel;
     this->events=(TTree*)(this->tfile)->Get(treename.c_str());
     if(Verbosity>0) dout << "The " << write_mc_or_data(is_data) << " file " << this->filename << " has been added successfully to the list of samples. " << endl;
+    long long measured_nevents=(this->events)->GetEntries();
+    if((m_Nentries>1||m_Nentries<0)&measured_nevents!=this->Nentries) {
+      //special cases: m_Nentries=1 : we want to give each event the full weight (->scans!)
+      //               m_Nentries=-1: detect the number of events and set the nevents automatically
+
+      stringstream warning;
+      warning << "Detected incorrect number of events in sample initialization of sample " << m_filename << " (detected Nevents: " << measured_nevents << " , definition claims: " << this->Nentries << "; will use measured number of events. If you want to use this algorithm to set the number of events anyway, set the number of events to -1.";
+      if(m_Nentries>1) write_warning(__FUNCTION__,warning.str());
+      this->Nentries=measured_nevents;
+    }
   }
   else {
     this->is_active=false;
