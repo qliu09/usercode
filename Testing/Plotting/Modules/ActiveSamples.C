@@ -103,7 +103,7 @@ void define_samples(bool showList, samplecollection &allsamples, samplecollectio
     long long totEventsQCD500to1000  = 10e10;  //unknown but now suppressed. (no event passes anyway)
     long totEventsQCD1000toInf  = 163185;
     
-    long totEventsZjets         = 32005720;//summer11
+    long totEventsZjets         = 34940743;//summer11
     //spring:2313911.0;//2743142.0; // DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola
     long totEventsTTbar         =  3701872;//summer11
     //1161621.0;//Spring//1144028.0; // PabloV13/TTJets_TuneZ2_7TeV-madgraph-tauola
