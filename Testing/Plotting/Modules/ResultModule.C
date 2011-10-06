@@ -100,7 +100,7 @@ void fill_result_histos(float &zossfp, float &zossfperr, float &zosofp, float &z
     delete SBOSOFN;
   }
   
-  flag_this_change(__FUNCTION__,__LINE__,false);//PlottingSetup::RestrictToMassPeak
+  flag_this_change(__FUNCTION__,__LINE__,true);//PlottingSetup::RestrictToMassPeak
   if(PlottingSetup::RestrictToMassPeak) result = zossfn + (1.0/3.)*(zosofp-zosofn)+ (1.0/3.)*(sbossfp-sbossfn)+ (1.0/3.)*(sbosofp-sbosofn);
   else result = zossfn + (zosofp-zosofn);
     
@@ -305,7 +305,7 @@ vector<float> get_result_between_two_fixed_jzb_values(float cut , float cuthigh,
     if(chatty) {
       dout << "        Pred(ZJets ) \t " << zossfn << endl;
       dout << "        Pred(e&mu;]) \t " << zosofp << "-" << zosofn << " = " << zosofp-zosofn<<endl;
-    flag_this_change(__FUNCTION__,__LINE__,false);//PlottingSetup::RestrictToMassPeak
+    flag_this_change(__FUNCTION__,__LINE__,true);//PlottingSetup::RestrictToMassPeak
     if(PlottingSetup::RestrictToMassPeak) {
 	dout << "        Pred(ossf,sb]) \t " << sbossfp << "-" << sbossfn<<" = "<<sbossfp-sbossfn<<endl;
 	dout << "        Pred(osof,sb]) \t " << sbosofp << "-" << sbosofn<<" = "<<sbosofp-sbosofn<<endl;
@@ -316,7 +316,7 @@ vector<float> get_result_between_two_fixed_jzb_values(float cut , float cuthigh,
   if(mcordata==data) {
     //store the result!
     Nobs.push_back(zossfp);
-    flag_this_change(__FUNCTION__,__LINE__,false);//PlottingSetup::RestrictToMassPeak
+    flag_this_change(__FUNCTION__,__LINE__,true);//PlottingSetup::RestrictToMassPeak
     if(PlottingSetup::RestrictToMassPeak) Npred.push_back(zossfn + (1.0/3)*(zosofp-zosofn)+ (1.0/3)*(sbossfp-sbossfn)+ (1.0/3)*(sbosofp-sbosofn));
     else Npred.push_back(zossfn + (zosofp-zosofn));
     float totprederr=0;
