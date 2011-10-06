@@ -25,7 +25,6 @@ void todo() {
   dout << "My to do list: " << endl;
   dout << "  - ExperimentalModule::Poisson_ratio_plot : Get the second part to work!" << endl;
   dout << "  - Exclusion plots (SMS done, mSUGRA still to be completed!)" << endl;
-  dout << "  - Nicer ratio plots (separate pad)" << endl;
 }  
   
 void find_peaks(float &MCPeak,float &MCPeakError, float &DataPeak, float &DataPeakError, float &MCSigma, float &DataSigma, stringstream &result)
@@ -407,6 +406,11 @@ void signal_bg_comparison()
   TCut kSMS2("MassGlu==800&&MassLSP==200");
   TCut kSMS3("MassGlu==1050&&MassLSP==850");
   TCut kSMS4("MassGlu==1200&&MassLSP==100");
+  
+  //If the scan samples haven't been loaded yet, this is a good point to load them (all of them!)
+  if((scansample.collection).size()<1) define_SMS_sample(false, allsamples, signalsamples, scansample, true); // loading ALL zones for the scans, not only the basic one.
+
+  
   TH1F *JZBplotSMS1 = scansample.Draw("JZBplotSMS1",jzbvariablemc,sbg_nbins,sbg_min,sbg_max, "JZB [GeV]", "events",cutmass&&cutOSSF&&cutnJets&&kSMS1,mc,simulatedlumi,scansample.FindSample("t"));
   JZBplotSMS1->Scale(JZBplotLM4->Integral()/JZBplotSMS1->Integral());
   

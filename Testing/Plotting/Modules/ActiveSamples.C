@@ -44,18 +44,18 @@ void define_SMS_sample(bool showList, samplecollection &allsamples, samplecollec
     CRUCIAL: The NAME needs to contain either "SMS" or "mSUGRA" for the SUSY scan algorithm (to be able to distinguish the two)
     
     */
+
+    string prefix="/shome/";
+    if((int)((string)hostname).find("falda")>-1) prefix="/scratch/";
     
-    if((int)((string)hostname).find("falda")>-1) {
-	scansample.AddSample("/scratch/buchmann/mSUGRA3.root","SMS_T6Z",1,1,false,true,1,kRed); // there is only one sample in the scan; we give each event weight "1"
-    } else {
       /// NEW: Only indicate the very first file - please place scans in ntuples/SMS/ and adapt the name here and in SUSYScan.C (the files are loaded when needed avoiding high memory usage and startup times)
 //	scansample.AddSample("/shome/buchmann/ntuples/mSUGRA/mSUGRA_clean_splitup_0_0.root","mSUGRA",1,1,false,true,0,kRed); // there is only one sample in the scan; we give each event weight "1"
-	scansample.AddSample("/shome/buchmann/ntuples/SMS/SMS_clean_splitup_0_0.root","SMS",1,1,false,true,0,kRed); // there is only one sample in the scan; we give each event weight "1"
-    }
+	scansample.AddSample(prefix+"buchmann/ntuples/SMS/SMS_clean_splitup_0_0.root","SMS",1,1,false,true,0,kRed); // there is only one sample in the scan; we give each event weight "1"
+
     if(loadall) {
       for(int ix=0;ix<PlottingSetup::ScanXzones;ix++) {
 	for(int iy=1;iy<PlottingSetup::ScanYzones;iy++) {//note: the "zero-zero" sample is already loaded above!
-	  scansample.AddSample(("/shome/buchmann/ntuples/SMS/SMS_clean_splitup_"+any2string(ix)+"_"+any2string(iy)+".root"),"SMS",1,1,false,true,ix*PlottingSetup::ScanXzones+iy,kRed); // there is only one sample in the scan; we give each event weight "1"
+	  scansample.AddSample((prefix+"buchmann/ntuples/SMS/SMS_clean_splitup_"+any2string(ix)+"_"+any2string(iy)+".root"),"SMS",1,1,false,true,ix*PlottingSetup::ScanXzones+iy,kRed); // there is only one sample in the scan; we give each event weight "1"
 	}
       }
     }
@@ -147,104 +147,45 @@ void define_samples(bool showList, samplecollection &allsamples, samplecollectio
     char hostname[1023];
     gethostname(hostname,1023);
     
-    if((int)((string)hostname).find("falda")>-1) {
-      //not running locally on my computer
-//      allsamples.AddSample("/scratch/buchmann/ntuples2011/data/AllData_Jul6_1078pb_boolean.root","Data",1,1,true,false,0,kBlack); // this is the 1078 /pb version
-//      allsamples.AddSample("/scratch/fronga/v1.47/AllData_1.4fb_stripped.root","Data",1,1,true,false,0,kBlack);
-//      allsamples.AddSample("/scratch/buchmann/Data_Aug26__1936.root","Data",1,1,true,false,0,kBlack);
-	allsamples.AddSample("/scratch/buchmann/ntuples2011/data/AllData_Aug26__2048_ipb__NewFormat_Complete_official.root","Data",1,1,true,false,0,kBlack);
-//      allsamples.AddSample("/scratch/buchmann/ntuples2011/data/Data_v6_test.root","Data",1,1,true,false,0,kBlack);
-//      allsamples.AddSample("/scratch/fronga/JSON_160404-163869_v1.29/AllCertified191_v1.29.root","Data",1,1,true,false,0,kBlack); // this is the version used for the 2011 PAS (update), i.e. SUS-11-012
-      
-      allsamples.AddSample("/scratch/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/TTJets_TuneZ2_7TeV-madgraph-tauola_Summer11_2.root","TTbar",totEventsTTbar,TTbarCrossSection,false,false,1,ttbar_color);//summer11
-      allsamples.AddSample("/scratch/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/WJetsToLNu_TuneZ2_7TeV-madgraph-tauola.root","WJets",totEventsWJets,WJetsCrossSection,false,false,3,wjets_color);//summer
-      allsamples.AddSample("/scratch/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/VVJetsTo4L_TuneD6T_7TeV-madgraph-tauola.root","DiBosons",totEventsVVJets,VVJetsCrossSection,false,false,4,diboson_color);
-      allsamples.AddSample("/scratch/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/TToBLNu_TuneZ2_s-channel_7TeV-madgraph_2.root","SingleTop",totEventsSingleTopS,SingleTopSCrossSection,false,false,2,singletop_color);
-      allsamples.AddSample("/scratch/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/TToBLNu_TuneZ2_t-channel_7TeV-madgraph.root","SingleTop",totEventsSingleTopT,SingleTopTCrossSection,false,false,2,singletop_color);
-      allsamples.AddSample("/scratch/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/TToBLNu_TuneZ2_tW-channel_7TeV-madgraph.root","SingleTop",totEventsSingleTopU,SingleTopUCrossSection,false,false,2,singletop_color);
-      allsamples.AddSample("/scratch/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/ZinvisibleJets_7TeV-madgraph.root","Z nunu",totEventsZnunu,ZnunuCrossSection,false,false,4,diboson_color);
-      allsamples.AddSample("/scratch/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Summer11.root","ZJets",totEventsZjets,ZJetsCrossSection,false,false,6,dy_color);//summer11
-      allsamples.AddSample("/scratch/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/LM4_SUSY_sftsht_7TeV-pythia6.root","LM4",totEventsLM4,LM4CrossSection,false,true,7,lm_color);
-
-
-      signalsamples.AddSample("/scratch/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/LM0_SUSY_sftsht_7TeV-pythia6.root","LM0",219796,38.93*1.41 ,false,true,3,lm_color);
-      signalsamples.AddSample("/scratch/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/LM1_SUSY_sftsht_7TeV-pythia6.root","LM1",218176,4.888*1.34,false,true,4,lm_color);
-      signalsamples.AddSample("/scratch/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/LM2_SUSY_sftsht_7TeV-pythia6.root","LM2",206336,0.6027*1.33,false,true,5,lm_color);
-      signalsamples.AddSample("/scratch/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/LM3_SUSY_sftsht_7TeV-pythia6.root","LM3",215120,3.438*1.40,false,true,6,lm_color);
-      signalsamples.AddSample("/scratch/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/LM4_SUSY_sftsht_7TeV-pythia6.root","LM4",totEventsLM4,LM4CrossSection,false,true,1,lm_color);
-      signalsamples.AddSample("/scratch/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/LM5_SUSY_sftsht_7TeV-pythia6.root","LM5",223992,0.473*1.34,false,true,7,lm_color);
-      signalsamples.AddSample("/scratch/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/LM8_SUSY_sftsht_7TeV-pythia6.root","LM8",totEventsLM8,LM8CrossSection,false,true,2,lm_color);
-      signalsamples.AddSample("/scratch/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/LM9_SUSY_sftsht_7TeV-pythia6.root","LM9",227808,7.134*1.48,false,true,8,lm_color);
-      signalsamples.AddSample("/scratch/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/LM11_SUSY_sftsht_7TeV-pythia6.root","LM11",218703,0.8236*1.35,false,true,9,lm_color);
-      signalsamples.AddSample("/scratch/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/LM12_SUSY_sftsht_7TeV-pythia6.root","LM12",223491,4.414*1.34,false,true,10,lm_color);
-      signalsamples.AddSample("/scratch/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/LM13_SUSY_sftsht_7TeV-pythia6.root","LM13",173240,6.899*1.42,false,true,11,lm_color);
-
-
-    } else {
-
-        
-      allsamples.AddSample("/shome/buchmann/ntuples/Data/AllData_2809pb.root","Data",1,1,true,false,0,kBlack);
-//      allsamples.AddSample("/shome/buchmann/ntuples/Data/AllData_2096pb_v158.root","Data",1,1,true,false,0,kBlack);
-        
-//      allsamples.AddSample("/shome/buchmann/ntuples/Data/Latest_assemblage.root","Data",1,1,true,false,0,kBlack);
-
-      allsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/TTJets_TuneZ2_7TeV-madgraph-tauola_Summer11_2.root","TTbar",totEventsTTbar,TTbarCrossSection,false,false,1,ttbar_color);//summer11
-
-//write_warning(__FUNCTION__,"TEMPORARILY USING POWHEG TT to 2l 2nu 2b sample!");
-//allsamples.AddSample("/scratch/buchmann/ntuples/NewPOWHEG_sample/TTTo2L2Nu2B_7TeV-powheg-pythia6__Summer11-PU_S4_START42_V11-v1___previously_TTJets.root","TTbar",10339374,16.53,false,false,1,ttbar_color);//summer11
-//xs from https://twiki.cern.ch/twiki/bin/view/CMS/CrossSectionDetails
-
-      allsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/WJetsToLNu_TuneZ2_7TeV-madgraph-tauola_Summer11.root","WJets",totEventsWJets,WJetsCrossSection,false,false,3,wjets_color);//summer
-      allsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/VVJetsTo4L_TuneD6T_7TeV-madgraph-tauola.root","DiBosons",totEventsVVJets,VVJetsCrossSection,false,false,4,diboson_color);
-      allsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/TToBLNu_TuneZ2_s-channel_7TeV-madgraph_2.root","SingleTop",totEventsSingleTopS,SingleTopSCrossSection,false,false,2,singletop_color);
-      allsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/TToBLNu_TuneZ2_t-channel_7TeV-madgraph.root","SingleTop",totEventsSingleTopT,SingleTopTCrossSection,false,false,2,singletop_color);
-      allsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/TToBLNu_TuneZ2_tW-channel_7TeV-madgraph.root","SingleTop",totEventsSingleTopU,SingleTopUCrossSection,false,false,2,singletop_color);
-      allsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/ZinvisibleJets_7TeV-madgraph.root","Z nunu",totEventsZnunu,ZnunuCrossSection,false,false,4,diboson_color);
-      allsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Summer11.root","ZJets",totEventsZjets,ZJetsCrossSection,false,false,7,dy_color);//summer11
-//      allsamples.AddSample("/scratch/buchmann/Skimmed_DY.root","ZJets",totEventsZjets,ZJetsCrossSection,false,false,6,dy_color);//summer11
-     allsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM4_SUSY_sftsht_7TeV-pythia6.root","LM4",totEventsLM4,LM4CrossSection,false,true,8,lm_color);
-
-
-      signalsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM0_SUSY_sftsht_7TeV-pythia6.root","LM0",219796,38.93*1.41 ,false,true,3,lm_color);
-      signalsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM1_SUSY_sftsht_7TeV-pythia6.root","LM1",218176,4.888*1.34,false,true,4,lm_color);
-      signalsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM2_SUSY_sftsht_7TeV-pythia6.root","LM2",206336,0.6027*1.33,false,true,5,lm_color);
-      signalsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM3_SUSY_sftsht_7TeV-pythia6.root","LM3",215120,3.438*1.40,false,true,6,lm_color);
-      signalsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM4_SUSY_sftsht_7TeV-pythia6.root","LM4",totEventsLM4,LM4CrossSection,false,true,1,lm_color);
-      signalsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM5_SUSY_sftsht_7TeV-pythia6.root","LM5",223992,0.473*1.34,false,true,7,lm_color);
-      signalsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM8_SUSY_sftsht_7TeV-pythia6.root","LM8",totEventsLM8,LM8CrossSection,false,true,2,lm_color);
-      signalsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM9_SUSY_sftsht_7TeV-pythia6.root","LM9",227808,7.134*1.48,false,true,8,lm_color);
-      signalsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM11_SUSY_sftsht_7TeV-pythia6.root","LM11",218703,0.8236*1.35,false,true,9,lm_color);
-      signalsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM12_SUSY_sftsht_7TeV-pythia6.root","LM12",223491,4.414*1.34,false,true,10,lm_color);
-      signalsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM13_SUSY_sftsht_7TeV-pythia6.root","LM13",173240,6.899*1.42,false,true,11,lm_color);
-
-
-
-      // We do not use the following (rare) samples; nonetheless we include them in a separate category to prove that they are negligible
-      raresample.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/TTWWTo2Lplus2Nu_NTP.root","Rare SS",39791,4.76E-5,false,false,6,rare_color);//summer11
-      raresample.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/WWminusTo2L2Nu_NTP.root","Rare SS",51063,0.001559,false,false,6,rare_color);//summer11
-      raresample.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/TTWWTo2Lminus2Nu_NTP.root","Rare SS",39496 ,4.719E-5,false,false,6,rare_color);//summer11
-      raresample.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/TTWTo2Lplus2Nu_NTP.root","Rare SS",48764,0.006841,false,false,6,rare_color);//summer11
-      raresample.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/WWplusTo2L2Nu_NTP.root","Rare SS",48244 ,0.004216,false,false,6,rare_color);//summer11
-      raresample.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/TTZTo2Lplus2Nu_NTP.root","Rare SS",36740,0.002024,false,false,6,rare_color);//summer11
-      raresample.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/WWWTo2Lplus2Nu_NTP.root","Rare SS",43322,0.008957,false,false,6,rare_color);//summer11
-      raresample.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/TTWTo2Lminus2Nu_NTP.root","Rare SS",50435,0.002705,false,false,6,rare_color);//summer11
-      raresample.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/WWWTo2Lminus2Nu_NTP.root","Rare SS",17147,0.004109,false,false,6,rare_color);//summer11
-      raresample.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/TTZTo2Lminus2Nu_NTP.root","Rare SS",36781,0.001946,false,false,6,rare_color);//summer11
-
-
-
-
-    }
-    /**/
-//    signalsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/WithTwoSix/LM4_SUSY_sftsht_7TeV-pythia6.root","REALLY OLD LM4!",218536,1.879,false,true,1,lm_color);
-//    signalsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/WithTwoSix/LM8_SUSY_sftsht_7TeV-pythia6.root","REALLY OLD LM8!",218536,0.73,false,true,1,lm_color);
+    string prefix="/shome/";
+    if((int)((string)hostname).find("falda")>-1) prefix="/scratch/";
     
-//    scansample.AddSample("/scratch/fronga/SMS/T6z_GlGlToQQZQQZ_38xFall10.root","T6Z",1,1,false,true,1,lm_color); // there is only one sample in the scan; we give each event weight "1"
-    //scansample.AddSample("/scratch/buchmann/allfinalevent_NTupleProducer_42X_mc.root","T6Z",1,1,false,true,1,lm_color); // there is only one sample in the scan; we give each event weight "1"
-//    scansample.AddSample("/scratch/buchmann/SUSYScanTestJZB.root","T6Z",1,1,false,true,1,lm_color); // there is only one sample in the scan; we give each event weight "1"
+    allsamples.AddSample(prefix+"buchmann/ntuples/Data/AllData_2809pb.root","Data",1,1,true,false,0,kBlack);
+    allsamples.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/TTJets_TuneZ2_7TeV-madgraph-tauola_Summer11_2.root","TTbar",totEventsTTbar,TTbarCrossSection,false,false,1,ttbar_color);//summer11
+    allsamples.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/WJetsToLNu_TuneZ2_7TeV-madgraph-tauola_Summer11.root","WJets",totEventsWJets,WJetsCrossSection,false,false,3,wjets_color);//summer
+    allsamples.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/VVJetsTo4L_TuneD6T_7TeV-madgraph-tauola.root","DiBosons",totEventsVVJets,VVJetsCrossSection,false,false,4,diboson_color);
+    allsamples.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/TToBLNu_TuneZ2_s-channel_7TeV-madgraph_2.root","SingleTop",totEventsSingleTopS,SingleTopSCrossSection,false,false,2,singletop_color);
+    allsamples.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/TToBLNu_TuneZ2_t-channel_7TeV-madgraph.root","SingleTop",totEventsSingleTopT,SingleTopTCrossSection,false,false,2,singletop_color);
+    allsamples.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/TToBLNu_TuneZ2_tW-channel_7TeV-madgraph.root","SingleTop",totEventsSingleTopU,SingleTopUCrossSection,false,false,2,singletop_color);
+    allsamples.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/ZinvisibleJets_7TeV-madgraph.root","Z nunu",totEventsZnunu,ZnunuCrossSection,false,false,4,diboson_color);
+    allsamples.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/DYJetsToLL_TuneZ2_M-50_7TeV-madgraph-tauola_Summer11.root","ZJets",totEventsZjets,ZJetsCrossSection,false,false,7,dy_color);//summer11
+    allsamples.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM4_SUSY_sftsht_7TeV-pythia6.root","LM4",totEventsLM4,LM4CrossSection,false,true,8,lm_color);
 
+    signalsamples.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM0_SUSY_sftsht_7TeV-pythia6.root","LM0",219796,38.93*1.41 ,false,true,3,lm_color);
+    signalsamples.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM1_SUSY_sftsht_7TeV-pythia6.root","LM1",218176,4.888*1.34,false,true,4,lm_color);
+    signalsamples.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM2_SUSY_sftsht_7TeV-pythia6.root","LM2",206336,0.6027*1.33,false,true,5,lm_color);
+    signalsamples.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM3_SUSY_sftsht_7TeV-pythia6.root","LM3",215120,3.438*1.40,false,true,6,lm_color);
+    signalsamples.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM4_SUSY_sftsht_7TeV-pythia6.root","LM4",totEventsLM4,LM4CrossSection,false,true,1,lm_color);
+    signalsamples.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM5_SUSY_sftsht_7TeV-pythia6.root","LM5",223992,0.473*1.34,false,true,7,lm_color);
+    signalsamples.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM8_SUSY_sftsht_7TeV-pythia6.root","LM8",totEventsLM8,LM8CrossSection,false,true,2,lm_color);
+    signalsamples.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM9_SUSY_sftsht_7TeV-pythia6.root","LM9",227808,7.134*1.48,false,true,8,lm_color);
+    signalsamples.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM11_SUSY_sftsht_7TeV-pythia6.root","LM11",218703,0.8236*1.35,false,true,9,lm_color);
+    signalsamples.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM12_SUSY_sftsht_7TeV-pythia6.root","LM12",223491,4.414*1.34,false,true,10,lm_color);
+    signalsamples.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM13_SUSY_sftsht_7TeV-pythia6.root","LM13",173240,6.899*1.42,false,true,11,lm_color);
 
-    define_SMS_sample(showList, allsamples, signalsamples, scansample, true); // loading ALL zones for the scans, not only the basic one.
+    // We do not use the following (rare) samples; nonetheless we include them in a separate category to prove that they are negligible
+    raresample.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/TTWWTo2Lplus2Nu_NTP.root","Rare SS",39791,4.76E-5,false,false,6,rare_color);//summer11
+    raresample.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/WWminusTo2L2Nu_NTP.root","Rare SS",51063,0.001559,false,false,6,rare_color);//summer11
+    raresample.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/TTWWTo2Lminus2Nu_NTP.root","Rare SS",39496 ,4.719E-5,false,false,6,rare_color);//summer11
+    raresample.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/TTWTo2Lplus2Nu_NTP.root","Rare SS",48764,0.006841,false,false,6,rare_color);//summer11
+    raresample.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/WWplusTo2L2Nu_NTP.root","Rare SS",48244 ,0.004216,false,false,6,rare_color);//summer11
+    raresample.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/TTZTo2Lplus2Nu_NTP.root","Rare SS",36740,0.002024,false,false,6,rare_color);//summer11
+    raresample.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/WWWTo2Lplus2Nu_NTP.root","Rare SS",43322,0.008957,false,false,6,rare_color);//summer11
+    raresample.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/TTWTo2Lminus2Nu_NTP.root","Rare SS",50435,0.002705,false,false,6,rare_color);//summer11
+    raresample.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/WWWTo2Lminus2Nu_NTP.root","Rare SS",17147,0.004109,false,false,6,rare_color);//summer11
+    raresample.AddSample(prefix+"buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/TTZTo2Lminus2Nu_NTP.root","Rare SS",36781,0.001946,false,false,6,rare_color);//summer11
+    
+    //scan files are only defined when necessary!
 
     if(showList) allsamples.ListSamples();
 
