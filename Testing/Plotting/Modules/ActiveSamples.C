@@ -52,7 +52,6 @@ void define_SMS_sample(bool showList, samplecollection &allsamples, samplecollec
 //	scansample.AddSample("/shome/buchmann/ntuples/mSUGRA/mSUGRA_clean_splitup_0_0.root","mSUGRA",1,1,false,true,0,kRed); // there is only one sample in the scan; we give each event weight "1"
 	scansample.AddSample("/shome/buchmann/ntuples/SMS/SMS_clean_splitup_0_0.root","SMS",1,1,false,true,0,kRed); // there is only one sample in the scan; we give each event weight "1"
     }
-    write_warning(__FUNCTION__,"Temporarily deactivated loading the full scan! Please remove this line ... ");loadall=false;
     if(loadall) {
       for(int ix=0;ix<PlottingSetup::ScanXzones;ix++) {
 	for(int iy=1;iy<PlottingSetup::ScanYzones;iy++) {//note: the "zero-zero" sample is already loaded above!
@@ -212,9 +211,7 @@ void define_samples(bool showList, samplecollection &allsamples, samplecollectio
       signalsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM3_SUSY_sftsht_7TeV-pythia6.root","LM3",215120,3.438*1.40,false,true,6,lm_color);*/
       signalsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM4_SUSY_sftsht_7TeV-pythia6.root","LM4",totEventsLM4,LM4CrossSection,false,true,1,lm_color);/*
       signalsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM5_SUSY_sftsht_7TeV-pythia6.root","LM5",223992,0.473*1.34,false,true,7,lm_color);*/
-write_warning(__FUNCTION__,"Watch out, LM* has been deactivated!");
-//      signalsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM8_SUSY_sftsht_7TeV-pythia6.root","LM8",totEventsLM8,LM8CrossSection,false,true,2,lm_color);
-/*
+      signalsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM8_SUSY_sftsht_7TeV-pythia6.root","LM8",totEventsLM8,LM8CrossSection,false,true,2,lm_color);/*
       signalsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM9_SUSY_sftsht_7TeV-pythia6.root","LM9",227808,7.134*1.48,false,true,8,lm_color);
       signalsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM11_SUSY_sftsht_7TeV-pythia6.root","LM11",218703,0.8236*1.35,false,true,9,lm_color);
       signalsamples.AddSample("/shome/buchmann/ntuples/MC/MixedSpringSummerMCepsPU_v2/MCSummer_PURW_172802_LP__JetID3p0/LM12_SUSY_sftsht_7TeV-pythia6.root","LM12",223491,4.414*1.34,false,true,10,lm_color);
