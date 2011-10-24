@@ -16,9 +16,9 @@ namespace PlottingSetup {
 
   string directoryname="SNAF_tester";
   
-  bool RestrictToMassPeak=false; //if you want to switch between offpeak ("false") and onpeak ("true") analysis please use this switch; the masscut below will be adapted automatically when adding samples :-)
+  bool RestrictToMassPeak=true; //if you want to switch between offpeak ("false") and onpeak ("true") analysis please use this switch; the masscut below will be adapted automatically when adding samples :-)
   
-  float luminosity=2809.994;//1936;//751.0;//486.0;//468.0//336.;//pb^{-1}
+  float luminosity=3523.18;//1936;//751.0;//486.0;//468.0//336.;//pb^{-1}
   float lumiuncert=0.045;// to be indicated in [0,1] range, e.g. for 4% write 0.04
 
   string jzbvariabledata="jzb[1]+0.06*pt";
@@ -35,8 +35,8 @@ namespace PlottingSetup {
   TCut passtrig("(passed_triggers||!is_data)");
   TCut cutmass("abs(mll-91.2)<20");
   TCut genMassCut("abs(genMll-91.2)<20");
-  TCut openmasscut("mll>50"); // this is the mass cut used in the off peak analysis!
-  TCut openGenmasscut("genMll>50");
+  TCut openmasscut("mll>40"); // this is the mass cut used in the off peak analysis!
+  TCut openGenmasscut("genMll>40");
   //TCut cutmass("mll>2");
   TCut basiccut("mll>2");//basically nothing.
   TCut basicqualitycut("(pfJetGoodNum>=2&&pfJetGoodID[0]!=0)&&(pfJetGoodNum>=2&&pfJetGoodID[1]!=0)");//don't use this for the "essential cut", because we want to plot nJets as well as mll in the inclusive case; we thus use it as an addition nJets cut.
