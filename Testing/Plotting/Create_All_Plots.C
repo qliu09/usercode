@@ -52,7 +52,7 @@ int main(int narg, char *argv[])
   set_directory(directoryname);//Indicate the directory name where you'd like to save the output files in Setup.C
   set_treename("events");//you can set the treename here to be used; options are "events" (for reco) for "PFevents" (for particle flow)
 //  define_samples(showList,allsamples);
-  define_samples(showList,allsamples,signalsamples,scansample,raresample);
+  define_samples(showList,allsamples,signalsamples,scansample,raresample,systsamples);
   setlumi(luminosity);
   do_png(true);
   do_pdf(true);
@@ -72,24 +72,27 @@ int main(int narg, char *argv[])
   bool do_lepton_comparison         = false; ///DONE
   bool do_jzb_plots                 = false; /// DONE
   bool do_pred                      = false; /// DONE
-	bool overlay_signal               = false; /// Overlay LM4 signal to predictions
+  bool overlay_signal               = false; /// Overlay LM4 signal to predictions
   bool do_ratio                     = false; /// DONE ------------------------------------------- still need to adapt the legend!
   bool do_signal_bg_comparison_plot = false; /// DONE
+  bool do_jzb_efficiency_curve      = false;
   bool do_ttbar_comparison          = false; /// DONE
-  bool do_zjets_comparison          = false; /// DONE
+  bool do_zjets_comparison          = true; /// DONE
+  bool do_JES                       = false; /// DONE
 ////  bool calculate_pred_and_observed  = false; /// DONE -- now rerouted to the new way of computing results
 //  bool calculate_yields             = false; ///DONE /// superfluous (replaced by get_new_results)
   bool get_new_results              = false; ///DONE
-	bool dopoisson              = false;//should we calculate stat err with poisson? ///DONE
-	bool verbose                = false;//prints out a lot more information ... ///DONE
+  bool dopoisson                    = false;//should we calculate stat err with poisson? ///DONE
+  bool verbose                      = false;//prints out a lot more information ... ///DONE
   //--------------------------------------------
   // Systematics and limits
   bool do_compute_systematics=false; /// DONE (might want to add something related to the peak?)
-	bool requireZ=true; // should we require a Z for MC efficiency?
+  bool requireZ=true; // should we require a Z for MC efficiency?
+  bool do_compute_efficiency=false; /// This is the cumulative efficiency that we quoted in our first AN note. Not fully finished.
   bool do_prepare_limits_using_shapes=false; /// ALMOST DONE **************************************
   bool do_compute_upper_limits_from_counting_experiment=false; /// DONE
-	bool doobserved=false; // want to get the observed limit as well?
-	bool doquick=true; // this will cause the number of predicted/observed events to hurry up (no MC!)
+  bool doobserved=false; // want to get the observed limit as well?
+  bool doquick=true; // this will cause the number of predicted/observed events to hurry up (no MC!)
   
   //--------------------------------------------
   // More not-so-standard stuff
@@ -100,7 +103,7 @@ int main(int narg, char *argv[])
   
   //--------------------------------------------
   // To be run manually !
-  bool do_response_correction=false; ///DONE 
+  bool do_response_correction=true; ///DONE 
                //use this to find out the correction factor; originally this was done automatically but now you should do this separately and update Modules/Setup.C
   
   
@@ -118,7 +121,7 @@ int main(int narg, char *argv[])
   //**** part 1 : peak finding
   float MCPeak=0,MCPeakError=0,DataPeak=0,DataPeakError=0,MCSigma=10,DataSigma=10;
   method=Kostasmethod;//Kostasmethod;//dogaus3sigma;// options: dogaus,doKM,dogaus2sigma,dogaus3sigma
-  if(do_peak_finding||do_zjet_ttbar_shapes||do_region_comparison||do_jzb_plots||do_lepton_comparison||do_signal_bg_comparison_plot||do_pred||do_ratio||do_save_template||do_compute_upper_limits_from_counting_experiment||do_compute_systematics||do_model_scan||do_prepare_limits_using_shapes||do_all||get_new_results||do_ttbar_comparison||do_zjets_comparison) find_peaks(MCPeak,MCPeakError, DataPeak, DataPeakError,MCSigma,DataSigma,resultsummary);
+  if(do_peak_finding||do_zjet_ttbar_shapes||do_region_comparison||do_jzb_plots||do_lepton_comparison||do_signal_bg_comparison_plot||do_pred||do_ratio||do_save_template||do_compute_upper_limits_from_counting_experiment||do_compute_systematics||do_compute_efficiency||do_model_scan||do_prepare_limits_using_shapes||do_all||get_new_results||do_ttbar_comparison||do_zjets_comparison) find_peaks(MCPeak,MCPeakError, DataPeak, DataPeakError,MCSigma,DataSigma,resultsummary);
   
   stringstream datajzb;
   if(DataPeak>0) datajzb<<"("<<jzbvariabledata<<"-"<<TMath::Abs(DataPeak)<<")";
@@ -132,18 +135,17 @@ int main(int narg, char *argv[])
   dout << "    MC : " << mcjzb.str() << endl;
   
   //This is the binning we'll use for ratio plots
-  vector<float> ratio_binning; 
-  ratio_binning.push_back(0);
-  ratio_binning.push_back(5);
-  ratio_binning.push_back(10);
-  ratio_binning.push_back(20);
-  ratio_binning.push_back(50);
-  ratio_binning.push_back(100);
-  ratio_binning.push_back(200);
-  ratio_binning.push_back(350);
-  //ratio_binning.push_back(500);
+  global_ratio_binning.push_back(0);
+  global_ratio_binning.push_back(5);
+  global_ratio_binning.push_back(10);
+  global_ratio_binning.push_back(20);
+  global_ratio_binning.push_back(50);
+  global_ratio_binning.push_back(100);
+  global_ratio_binning.push_back(200);
+  global_ratio_binning.push_back(350);
+  //global_ratio_binning.push_back(500);
 
-  //these are the JZB cuts defining our search regions
+    //these are the JZB cuts defining our search regions
   vector<float> jzb_cut;
   jzb_cut.push_back(50);
 //  jzb_cut.push_back(75);
@@ -153,8 +155,10 @@ int main(int narg, char *argv[])
 //  jzb_cut.push_back(175);
   jzb_cut.push_back(200);
 //  jzb_cut.push_back(225);
-//  jzb_cut.push_back(250);
+  jzb_cut.push_back(250);
 
+
+  
   //**** part 2 : kinematic plots
   if(do_kinematic_variables||do_all) do_kinematic_plots();
   if(do_kinematic_PF_variables) do_kinematic_PF_plots();
@@ -166,21 +170,23 @@ int main(int narg, char *argv[])
   if (do_region_comparison||do_all) region_comparison_plots(mcjzb.str(),datajzb.str(),jzb_cut);
 
   //**** part 4: JZB plots (OSOF, OSSF) 
-  if(do_jzb_plots||do_all) jzb_plots(mcjzb.str(),datajzb.str(),ratio_binning);
+  if(do_jzb_plots||do_all) jzb_plots(mcjzb.str(),datajzb.str(),global_ratio_binning);
   //**** part 5 : Prediction plots
   if(do_pred||do_all) do_prediction_plots(mcjzb.str(),datajzb.str(),DataSigma,MCSigma,overlay_signal);
   
   //**** part 6: Ratio plots
-  if(do_ratio||do_all) do_ratio_plots(mcjzb.str(),datajzb.str(),ratio_binning);
+  if(do_ratio||do_all) do_ratio_plots(mcjzb.str(),datajzb.str(),global_ratio_binning);
   
   //**** part 7: some decoration: the old 
   if(do_signal_bg_comparison_plot||do_all) signal_bg_comparison();
-  if(do_ttbar_comparison||do_all) ttbar_sidebands_comparison(mcjzb.str(),ratio_binning);
-  if(do_zjets_comparison||do_all) zjets_prediction_comparison(mcjzb.str());
-    
-//  if(calculate_pred_and_observed||do_all) calculate_predicted_and_observed_eemm(MCPeak,MCPeakError,DataPeak,DataPeakError,jzb_cut);
-  
-    //**** part 8: observed and predicted!
+  if(do_ttbar_comparison||do_all) ttbar_sidebands_comparison(mcjzb.str(),global_ratio_binning);
+  if(do_zjets_comparison||do_all) zjets_prediction_comparison();
+  if(do_JES||do_all) make_JES_plot();
+
+  if (do_jzb_efficiency_curve ) plot_jzb_sel_eff(mcjzb.str(),signalsamples,jzb_cut);
+
+
+  //**** part 8: observed and predicted!
   if(do_all||get_new_results) doquick=false;
   if(do_all||do_save_template||do_compute_upper_limits_from_counting_experiment||do_model_scan||get_new_results) get_result(mcjzb.str(),datajzb.str(),DataPeakError,MCPeakError,jzb_cut,verbose,dopoisson,doquick);
   
@@ -191,13 +197,14 @@ int main(int narg, char *argv[])
   
   //------------------------ end of standard functions
   
-//  if(calculate_yields||do_all) calculate_all_yields(mcjzb.str(),jzb_cut); // now outdated - get_results now replaces this.
-  
-  
   vector<vector<float> > all_systematics;
-  if(do_compute_systematics||do_compute_upper_limits_from_counting_experiment||do_all) all_systematics=compute_systematics(mcjzb.str(),MCPeakError,datajzb.str(),signalsamples,jzb_cut,requireZ);
-  
-  if(do_compute_upper_limits_from_counting_experiment||do_all) compute_upper_limits_from_counting_experiment(all_systematics,jzb_cut,mcjzb.str(),doobserved);
+  vector<vector<float> > all_efficiency;
+
+  if(do_compute_systematics||do_compute_upper_limits_from_counting_experiment||do_all) all_systematics=compute_systematics(mcjzb.str(),MCPeakError,alwaysflip,datajzb.str(),signalsamples,jzb_cut,requireZ);
+//  if(do_compute_efficiency) compute_efficiency(mcjzb.str(),allsamples, 50, -200, 300);
+  if(do_compute_efficiency) write_warning(__FUNCTION__,"efficiency computation deactivated");
+
+  if(do_compute_upper_limits_from_counting_experiment||do_all) compute_upper_limits_from_counting_experiment(all_systematics,jzb_cut,mcjzb.str(),doobserved,alwaysflip);
   
   //------------------------ end of analysis parts - below: special applications
   

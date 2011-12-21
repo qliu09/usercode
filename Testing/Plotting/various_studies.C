@@ -14,13 +14,11 @@ to compile: just run make ... that should take care of it.
 #include "Modules/setTDRStyle.C"
 #include "Modules/ActiveSamples.C"
 #include "Modules/UpperLimitsWithShape.C"
-//#include "Modules/external/roostats_cl95.C"
-//#include "Modules/external/cl95cms.c"
 #include "Modules/Plotting_Functions.C" //also included for peak finding etc.
+#include "Modules/LimitCalculation.C"
 #include "Modules/ResultModule.C"
 #include "Modules/ExperimentalModule.C"
 #include "Modules/StudyModule.C" //also included for peak finding etc.
-#include "Modules/LimitCalculation.C"
 #include "Modules/Systematics.C"
 #include "Modules/CrossSectionReader.C"
 #include "Modules/SUSYScan.C"
@@ -56,7 +54,7 @@ int main()
   gStyle->SetTextFont(42);
   bool showList=false;
   set_treename("events");//you can set the treename here to be used; options are "events" (for reco) for "PFevents" (for particle flow)
-  define_samples(showList,allsamples,signalsamples,scansample,raresample);
+  define_samples(showList,allsamples,signalsamples,scansample,raresample,systsamples);
   setlumi(luminosity);
   do_png(true);
   do_pdf(false);
