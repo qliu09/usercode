@@ -16,6 +16,7 @@
 #include <TLegend.h>
 #include <TError.h>
 #include <TTreeFormula.h>
+#include <TDCacheFile.h>
 
 #define SampleClassLoaded
 
@@ -83,7 +84,7 @@ sample::sample(string m_filename, string m_samplename, long m_Nentries, float m_
     //suppressing  stupid 64/32 errors here (Warning in <TFile::ReadStreamerInfo>: /scratch/buchmann/MC_Spring11_PU_PF/TToBLNu_TuneZ2_t-channel_7TeV-madgraph.root: not a TStreamerInfo object)
     Int_t currlevel=gErrorIgnoreLevel;
     gErrorIgnoreLevel=5000;
-    this->tfile = new TFile(m_filename.c_str());
+    this->tfile = TFile::Open(m_filename.c_str(),"read");
     gErrorIgnoreLevel=currlevel;
     this->events=(TTree*)(this->tfile)->Get(treename.c_str());
     if(Verbosity>0) dout << "The " << write_mc_or_data(is_data) << " file " << this->filename << " has been added successfully to the list of samples. " << endl;
@@ -97,7 +98,7 @@ sample::sample(string m_filename, string m_samplename, long m_Nentries, float m_
       if(m_Nentries>1) write_warning(__FUNCTION__,warning.str());
       this->Nentries=measured_nevents;
     }
-  this->weight=(xs/(float)Nentries);
+    this->weight=(xs/(float)Nentries);
   }
   else {
     this->is_active=false;
@@ -121,12 +122,10 @@ bool doesROOTFileExist(string filename)
   //suppressing  stupid 64/32 errors here (Warning in <TFile::ReadStreamerInfo>: /scratch/buchmann/MC_Spring11_PU_PF/TToBLNu_TuneZ2_t-channel_7TeV-madgraph.root: not a TStreamerInfo object)
   Int_t currlevel=gErrorIgnoreLevel;
   gErrorIgnoreLevel=5000;
-  TFile *f = new TFile(filename.c_str());
+  TFile *f = TFile::Open(filename.c_str(),"read");
   
-  if (f->IsZombie()) {
-    dout << "Error opening file" << filename << endl;
-    return 0;
-  }
+  if (!f) return 0;
+
   f->Close();
   gErrorIgnoreLevel=currlevel;
   return 1;
