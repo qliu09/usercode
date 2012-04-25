@@ -1,0 +1,156 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+    <title>
+      CMS Monitoring Tool Playground
+    </title>
+    <script type="text/javascript" src="http://www.google.com/jsapi"></script>
+    <script type="text/javascript">
+      google.load('visualization', '1.1', {packages: ['controls']});
+    </script>
+    <script type="text/javascript">
+    var data
+    var categoryPicker
+    var ComboChart
+    var options
+    var dashboard
+    isSetup=false;
+    
+    function drawVisualization(HasBeenSetup,VariableName) {
+       if(!HasBeenSetup) {
+        categoryPicker = new google.visualization.ControlWrapper({
+          'controlType': 'CategoryFilter',
+          'containerId': 'control1',
+          'options': {
+            'title': 'CMSSW Version',
+            'filterColumnLabel': 'Version',
+            'ui': {
+              'allowTyping': false,
+              'allowMultiple': true,
+              'selectedValuesLayout': 'belowStacked'
+            }
+          },
+          // Define an initial state, i.e. a set of metrics to be initially selected.
+          'state': {'selectedValues': ['5.0', '5.1']} //////////////////////////////////////////////////////////////  Releases[0], if(count(Releases)>0) Releases[1] (only two)
+        });
+        }
+        // Define a gauge chart.
+        ComboChart = new google.visualization.ChartWrapper({
+          'chartType': 'ComboChart',
+          'containerId': 'chart1',
+          'options': {
+            'width': 1000,
+            'height': 600,
+            'title' : VariableName,
+            'vAxis' : 
+            {
+	      'title': VariableName
+	      },
+	    'hAxis' : 
+	    {
+	      'title': "CMSSW Version"
+	      },
+	    'seriesType': "bars",
+	    'series': {6: {'type': "line"}}  //////////////////////////////////////////////////////////////  NSites
+          }
+        });
+      
+        options = {
+          title : VariableName,
+          vAxis: {title: VariableName},
+          hAxis: {title: "CMSSW Version"},
+          seriesType: "bars",
+          series: {6: {type: "line"}}
+        };
+        // Create the dashboard.
+        dashboard = new google.visualization.Dashboard(document.getElementById('dashboard')).
+          
+          bind(categoryPicker, ComboChart).
+          // Draw the dashboard
+          draw(data,options);
+      }
+      
+      function startwith(variablename) {
+        if(variablename=="Runtime") {
+           data = google.visualization.arrayToDataTable([ //////////////////////////////////////////////////////////////  Evidently the data ...
+              ['Version', 'T2_CH_CSCS', 'T2_IT_Rome', 'T2_IT_Venice', 'T2_IT_Pisa','T2_MO_Moon', 'T2_MA_Mars', 'Average'],
+              ['5.0', 165, 190, 522, 152, 101, 56,197.66667],
+              ['5.1', 520, 565, 1020, 515, 531, 572,620.5],
+              ['5.2', 212, 231, 453, 214, 243, 217,261.66667],
+              ['6.0pre4', 812, 819, 1180, 834, 841, 846,888.66667],
+              ['6.0pre5', 136, 178, 450, 137, 127, 500,254.66667]
+           ]);
+        }
+        if(variablename=="CPUEfficiency") {
+           data = google.visualization.arrayToDataTable([//////////////////////////////////////////////////////////////  Evidently the data ...
+              ['Version', 'T2_CH_CSCS', 'T2_IT_Rome', 'T2_IT_Venice', 'T2_IT_Pisa','T2_MO_Moon', 'T2_MA_Mars', 'Average'],
+              ['5.0', 56/165, 56/190, 56/522, 56/152, 56/101, 56/56,56/197.66667],
+              ['5.1', 56/520, 56/565, 56/1020, 56/515, 56/531, 56/572,56/620.5],
+              ['5.2', 56/212, 56/231, 56/453, 56/214, 56/243, 56/217,56/261.66667],
+              ['6.0pre4', 56/812, 56/819, 56/1180, 56/834, 56/841, 56/846,56/888.66667],
+              ['6.0pre5', 56/136, 56/178, 56/450, 56/137, 56/127, 56/500,56/254.66667]
+           ]);
+        }
+        drawVisualization(isSetup,variablename);
+        isSetup=true;
+//        draw(data,options);
+        }
+
+//      google.setOnLoadCallback(drawVisualization);
+
+
+    function notyet() {
+       alert("Sorry, this variable has not been implemented. In fact, all stats you see right now are fake anyway ..");
+    }
+
+    </script>
+  </head>
+  <body style="font-family: Arial;border: 0 none;background-image:url(Plain_green_background.jpg)">
+  
+  <style type="text/css">
+a:link { font-weight:bold; color:white; text-decoration:none; }
+a:visited { font-weight:bold; color:silver; text-decoration:none; }
+a:focus { font-weight:bold; color:red; text-decoration:underline; }
+a:hover { font-weight:bold; color:yellow; text-decoration:none; }
+a:active { font-weight:bold; color:lime; text-decoration:underline; }
+
+h1:focus { background-color:red; }
+h1:hover { background-color:silver; }
+h1:active { background-color:green; }
+</style>
+  
+  <p align=center><font color="#FFFFFF">Pick your variable!</font></p>
+  <table width="100%"><tr valign=middle align=center border=2 bordercolor=black>
+  <tr>
+  <td align=center> <a href="javascript:startwith('Runtime')">Runtime</a> </td>
+  <td align=center><a href="javascript:startwith('CPUEfficiency')">CPU Efficiency</a></td>
+  
+  <td align=center><a href="javascript:notyet()">Time per Event</a></td>
+  <td align=center><a href="javascript:notyet()">Memory Usage</a></td>
+  <td align=center><a href="javascript:notyet()">Swap Usage</a></td>
+  </tr></table>
+  <table><tr><td align=center>
+    <div id="dashboard">
+      <table>
+        <tr style='vertical-align: top'>
+          <td style='width: 200px; font-size: 0.9em;'>
+            <div id="control1"></div>
+            <div id="control2"></div>
+            <div id="control3"></div>
+          </td>
+          <td style='width: 400px'>
+            <div style="float: left;" id="chart1"></div>
+            <div style="float: left;" id="chart2"></div>
+            <div style="float: left;" id="chart3"></div>
+          </td>
+        </tr>
+      </table>
+    </div>
+    </tr></td></table>
+    
+    <br><br><br><br><br><br><br><br><br>
+    
+    <p align=center><font color="#FFFFFF">What else am I working on ? Well .. retrieving the JSON files and processing them, mainly :-) </font></p>
+  </body>
+</html>
