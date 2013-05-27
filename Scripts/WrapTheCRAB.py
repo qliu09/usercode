@@ -22,7 +22,25 @@ TaskDatabase={}
 
 DoResubmit=False
 
-def DoTaskResubmission(ResubmissionJobList,TaskName):
+ResubmissionJobList=""
+NToBeResubmitted=0
+
+def AddForResubmission(JobNumber,TaskName):
+  global NToBeResubmitted
+  global ResubmissionJobList
+  if NToBeResubmitted<480:
+    ResubmissionJobList+=","+str(JobNumber)
+    NToBeResubmitted+=1
+  else:
+    print "     Need to resubmit the first 480 jobs (maybe there's more coming, but more than this at a time is a bad idea)"
+    DoTaskResubmission(TaskName)
+    ResubmissionJobList=","+str(JobNumber)
+    NToBeResubmitted=1
+
+
+def DoTaskResubmission(TaskName):
+    global ResubmissionJobList
+    global NToBeResubmitted
     if DoResubmit == False:
         print "     You've chosen to disable resubmission. Won't resubmit anything."
         return
@@ -34,7 +52,9 @@ def DoTaskResubmission(ResubmissionJobList,TaskName):
     for cline in pipe.readlines():
         if cline.find("ubmit") > -1:
             print cline
-
+    ResubmissionJobList=""
+    NToBeResubmitted=0
+    
 def RetrieveJobs(TaskName):
     print "     Going to retrieve "+str(TaskDatabase[TaskName]["Done"]) + " jobs : "
     Ntotal=TaskDatabase[TaskName]["Done"]
@@ -81,11 +101,14 @@ def process_job(TaskName):
 #    cmd="cat OtherReport.txt"
     nLine=0
     isReal=False
+    global ResubmissionJobList
+    global NToBeResubmitted
     ResubmissionJobList=""
+    NToBeResubmitted=0
     Perrors=""
     nJobs=0
     try:
-      pipe = subprocess.Popen(["crab -c "+TaskName+" -status"],shell=True,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+      pipe = subprocess.Popen("crab -c "+TaskName+" -status",shell=True,stdout=subprocess.PIPE)
       output = pipe.communicate()[0]
     except IOError as e:
       print "I/O error({0}): {1}".format(e.errno, e.strerror)
@@ -170,47 +193,60 @@ def process_job(TaskName):
         ScheduledForResubmission=False
 
         if Status=="Aborted" and not ScheduledForResubmission:
-            ResubmissionJobList+=","+str(JobNumber)
+	    AddForResubmission(JobNumber,TaskName)
+#            ResubmissionJobList+=","+str(JobNumber)
             JobDatabase[TaskName][JobNumber]["NRetries"]+=1
-            print "     Added this job for resubmission: "+line.rstrip()
+            if ResubmissionAlert: 
+	      print "     Added this job for resubmission: "+line.rstrip()
             ScheduledForResubmission=True
         if Status=="Done" and ExeExitCode > 0 and not ScheduledForResubmission:
-            ResubmissionJobList+=","+str(JobNumber)
+	    AddForResubmission(JobNumber,TaskName)
+#            ResubmissionJobList+=","+str(JobNumber)
             JobDatabase[TaskName][JobNumber]["NRetries"]+=1
-            print "     Added this job for resubmission: "+line.rstrip()
+            if ResubmissionAlert: 
+	      print "     Added this job for resubmission: "+line.rstrip()
             ScheduledForResubmission=True
         if Status=="Done" and JobExitCode > 0 and not ScheduledForResubmission:
-            ResubmissionJobList+=","+str(JobNumber)
+#            ResubmissionJobList+=","+str(JobNumber)
+	    AddForResubmission(JobNumber,TaskName)
             JobDatabase[TaskName][JobNumber]["NRetries"]+=1
-            print "     Added this job for resubmission: "+line.rstrip()
+            if ResubmissionAlert: 
+	      print "     Added this job for resubmission: "+line.rstrip()
             ScheduledForResubmission=True
         if Status=="Created":
-            ResubmissionJobList+=","+str(JobNumber)
+#            ResubmissionJobList+=","+str(JobNumber)
+	    AddForResubmission(JobNumber,TaskName)
             JobDatabase[TaskName][JobNumber]["NRetries"]+=1
-            print "     Added this job for resubmission: "+line.rstrip()
+            if ResubmissionAlert: 
+	      print "     Added this job for resubmission: "+line.rstrip()
             ScheduledForResubmission=True
         if Status=="Cleared" and ExeExitCode > 0 and not ScheduledForResubmission:
-            ResubmissionJobList+=","+str(JobNumber)
+	    AddForResubmission(JobNumber,TaskName)
+#            ResubmissionJobList+=","+str(JobNumber)
             JobDatabase[TaskName][JobNumber]["NRetries"]+=1
-            print "     Added this job for resubmission: "+line.rstrip()
+            if ResubmissionAlert: 
+	      print "     Added this job for resubmission: "+line.rstrip()
             ScheduledForResubmission=True
         if Status=="Cleared" and JobExitCode > 0 and not ScheduledForResubmission:
-            ResubmissionJobList+=","+str(JobNumber)
+	    AddForResubmission(JobNumber,TaskName)
+#            ResubmissionJobList+=","+str(JobNumber)
             JobDatabase[TaskName][JobNumber]["NRetries"]+=1
-            print "     Added this job for resubmission: "+line.rstrip()
+            if ResubmissionAlert: 
+	      print "     Added this job for resubmission: "+line.rstrip()
             ScheduledForResubmission=True
         if Status=="Scheduled":
             JobDatabase[TaskName][JobNumber]["NScheduled"]+=1
             if JobDatabase[TaskName][JobNumber]["NScheduled"] > 300/CheckInterval: ## if the job has been scheduled for 5 hours resubmit it
 		print "     Added this job for resubmission: "+line.rstrip()+"    [patience with this job ended, hence the resubmission]"
-                ResubmissionJobList+=","+str(JobNumber)
+#                ResubmissionJobList+=","+str(JobNumber)
+		AddForResubmission(JobNumber,TaskName)
                 JobDatabase[TaskName][JobNumber]["NRetries"]==0
                 ScheduledForResubmission=True
 
 
     ResubmissionJobList=ResubmissionJobList[1:len(ResubmissionJobList)]
     if len(ResubmissionJobList) > 1:
-        DoTaskResubmission(ResubmissionJobList,TaskName)
+        DoTaskResubmission(TaskName)
     
     if not "Done" in TaskDatabase[TaskName]:
         TaskDatabase[TaskName]["Done"]=0
