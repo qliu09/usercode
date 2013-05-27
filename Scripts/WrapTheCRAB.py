@@ -8,6 +8,7 @@ from sys import stdout
 from Countdown import *
 from optparse import OptionParser
 from datetime import datetime
+import subprocess
 
 CheckInterval=60 # (interval between checks, in minutes)
 
@@ -81,18 +82,28 @@ def process_job(TaskName):
     nLine=0
     isReal=False
     ResubmissionJobList=""
+    Perrors=""
     nJobs=0
     try:
-      pipe=popen(cmd)
+      pipe = subprocess.Popen(["crab -c "+TaskName+" -status"],shell=True,stdin=subprocess.PIPE,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
+      output = pipe.communicate()[0]
+    except IOError as e:
+      print "I/O error({0}): {1}".format(e.errno, e.strerror)
+    except ValueError:
+      print "Could not convert data to an integer."
     except:
+      print "Unexpected error:", sys.exc_info()[0]
+      raise
       print "THERE HAS BEEN AN ERROR - MAYBE THE LINES BELOW WRITTEN TO THE PIPE PROVIDE AN ANSWER"
-      for line in pipe.readlines():
-	print "Err line: "+str(line)
+      print Perrors
       print "THERE HAS BEEN AN ERROR - MAYBE THE LINES ABOVE WRITTEN TO THE PIPE PROVIDE AN ANSWER"
       return
 	
     NSuccess=0
-    for line in pipe.readlines():
+    
+    print "         ... retrieved info, processing"
+    
+    for line in output.splitlines():
         if line.find("Wrapper") > -1:
             result = line.split(" ")
             NextIsIt=False
