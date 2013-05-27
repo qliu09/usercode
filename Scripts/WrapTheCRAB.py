@@ -105,6 +105,7 @@ def process_job(TaskName):
     global NToBeResubmitted
     ResubmissionJobList=""
     NToBeResubmitted=0
+    ResubmissionAlert=False
     Perrors=""
     nJobs=0
     try:
