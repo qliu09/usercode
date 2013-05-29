@@ -4,6 +4,7 @@ import sys
 import time
 from os import popen, path
 from sys import stdout
+import tempfile
 
 from Countdown import *
 from optparse import OptionParser
@@ -79,6 +80,39 @@ def RetrieveJobs(TaskName):
         Ndownloaded+=1
     print "\033[2K     Downloaded "+str(Ndownloaded)+" results out of "+str(Ntotal)+" (any discrepancy here may hint at corrupted output which will be detected later)"
 
+def OldGetStatus(TaskName): 
+  try:
+    pipe = subprocess.Popen("crab -c "+TaskName+" -status",shell=True,stdout=subprocess.PIPE)
+    output = pipe.communicate()[0]
+    return output.splitlines()
+  except OSError as e:
+    print "Operating system error({0}): {1}".format(e.errno, e.strerror)
+    return {}
+  except IOError as e:
+    print "I/O error({0}): {1}".format(e.errno, e.strerror)
+    return {}
+  except ValueError:
+    print "Could not convert data to an integer."
+    return {}
+  except:
+    print "Unexpected error:", sys.exc_info()[0]
+    raise
+    print "THERE HAS BEEN AN ERROR - MAYBE THE LINES BELOW WRITTEN TO THE PIPE PROVIDE AN ANSWER"
+    print Perrors
+    print "THERE HAS BEEN AN ERROR - MAYBE THE LINES ABOVE WRITTEN TO THE PIPE PROVIDE AN ANSWER"
+    return {}
+
+def GetStatus(TaskName):
+  nfp = tempfile.NamedTemporaryFile()
+  tempfilename=nfp.name
+  print "       ... now getting all information about task ... "
+  cmd="crab -c "+TaskName+" -status > "+tempfilename
+  os.system(cmd)
+  FullStatus=[]
+  for line in nfp.readlines():
+    FullStatus.append(line.rstrip())
+  nfp.close()
+  return FullStatus
 
 def process_job(TaskName):
     
@@ -108,26 +142,13 @@ def process_job(TaskName):
     ResubmissionAlert=False
     Perrors=""
     nJobs=0
-    try:
-      pipe = subprocess.Popen("crab -c "+TaskName+" -status",shell=True,stdout=subprocess.PIPE)
-      output = pipe.communicate()[0]
-    except IOError as e:
-      print "I/O error({0}): {1}".format(e.errno, e.strerror)
-    except ValueError:
-      print "Could not convert data to an integer."
-    except:
-      print "Unexpected error:", sys.exc_info()[0]
-      raise
-      print "THERE HAS BEEN AN ERROR - MAYBE THE LINES BELOW WRITTEN TO THE PIPE PROVIDE AN ANSWER"
-      print Perrors
-      print "THERE HAS BEEN AN ERROR - MAYBE THE LINES ABOVE WRITTEN TO THE PIPE PROVIDE AN ANSWER"
-      return
-	
+    
+    FullStatus = GetStatus(TaskName) 	
     NSuccess=0
     
     print "         ... retrieved info, processing"
     
-    for line in output.splitlines():
+    for line in FullStatus:
         if line.find("Wrapper") > -1:
             result = line.split(" ")
             NextIsIt=False
@@ -208,6 +229,20 @@ def process_job(TaskName):
 	      print "     Added this job for resubmission: "+line.rstrip()
             ScheduledForResubmission=True
         if Status=="Done" and JobExitCode > 0 and not ScheduledForResubmission:
+#            ResubmissionJobList+=","+str(JobNumber)
+	    AddForResubmission(JobNumber,TaskName)
+            JobDatabase[TaskName][JobNumber]["NRetries"]+=1
+            if ResubmissionAlert: 
+	      print "     Added this job for resubmission: "+line.rstrip()
+            ScheduledForResubmission=True
+        if Status=="Retrieved" and ExeExitCode > 0 and not ScheduledForResubmission:
+	    AddForResubmission(JobNumber,TaskName)
+#            ResubmissionJobList+=","+str(JobNumber)
+            JobDatabase[TaskName][JobNumber]["NRetries"]+=1
+            if ResubmissionAlert: 
+	      print "     Added this job for resubmission: "+line.rstrip()
+            ScheduledForResubmission=True
+        if Status=="Retrieved" and JobExitCode > 0 and not ScheduledForResubmission:
 #            ResubmissionJobList+=","+str(JobNumber)
 	    AddForResubmission(JobNumber,TaskName)
             JobDatabase[TaskName][JobNumber]["NRetries"]+=1
