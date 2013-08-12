@@ -398,7 +398,7 @@ int main() {
     WriteToStorage();
     
     HaveValidSLHA=CreateSLHAFile();
-      assert(0);
+
     std::cout << "After generating the SLHA file, do we have a valid one ? " << HaveValidSLHA << std::endl;
     nAttempts++;
   
