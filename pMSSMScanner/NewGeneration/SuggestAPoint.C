@@ -2,8 +2,10 @@
 #include <assert.h>
 #include <fstream>
 #include <sstream>
+#include "pMSSMRange.C"
 #include "../MicroInput.C"
 #include "../StorageLibrary.C"
+#include "NDimensionalSphere.C"
 #include <TRandom3.h>
 #include <TSystem.h>
 
@@ -68,70 +70,7 @@ void FinalSteps() {
   std::cerr << "Have not yet defined final steps ... " << std::endl;
 }
 
-void DefineRange(const int ipar, float &lowrange, float &highrange) {
-  if(ipar==0) {
-    lowrange=1;
-    highrange=60;
-    return;
-  }
-  if(ipar==1) {
-    lowrange=50;
-    highrange=2000;
-    return;
-  }
-  if(ipar==2) { //M1
-    lowrange=-2500;
-    highrange=2500;
-    return;
-  }
-  if(ipar==3) { //M2
-    lowrange=-2500;
-    highrange=2500;
-    return;
-  }
-  if(ipar==4) { //M3
-    lowrange=50;
-    highrange=2500;
-    return;
-  }
-  if(ipar==5) { // Ad,s,b
-    lowrange=-2000;
-    highrange=2000;
-    return;
-  }
-  if(ipar==6) { // Au,c,t
-    lowrange=-2000;
-    highrange=2000;
-    return;
-  }
-  if(ipar==7) { // Ae,mu,tau
-    lowrange=-2000;
-    highrange=2000;
-    return;
-  }
-  if(ipar==8) { // mu
-    lowrange=-1000;
-    highrange=2000;
-    return;
-  }
-  if(ipar>=9 && ipar<20) {
-    lowrange=50;
-    highrange=2500;
-    return;
-  // MebarL=MmubarL
-  // MebarR=MmubarR
-  // MtaubarL
-  // Mq1barL, Mq2barL
-  // Mqbar3L
-  //MubarR=McbarR
-  //MtbarR
-  //MdbarR=MsbarR
-  //MbbarR
-  }
-  std::cout << "Received unknown case : " << ipar << std::endl;
-  assert(0);
-  return;
-}
+
 
 float GetRandomParameter(const int ipar) {
   float lowrange,hirange;
@@ -166,20 +105,20 @@ void LoadBestConfig() {
     std::string info;
     float compatibility;
     while(PointStorage >> info >> pMSSMpars[0] >> pMSSMpars[1] >> pMSSMpars[2] >> pMSSMpars[3] >> pMSSMpars[4] >> pMSSMpars[5] >> pMSSMpars[6] >> pMSSMpars[7] >> pMSSMpars[8] >> pMSSMpars[9] >> pMSSMpars[10] >> pMSSMpars[11] >> pMSSMpars[12] >> pMSSMpars[13] >> pMSSMpars[14] >> pMSSMpars[15] >> pMSSMpars[16] >> pMSSMpars[17] >> pMSSMpars[18] >> pMSSMpars[19] >> compatibility) {
-      std::cout << "Loading information" << std::endl;
+      std::cout << "Loading line from RecentPointStorage ... " << std::endl;
       if(info == "BestPoint") {
 	if(pMSSMpars[0]>-10000) ExistsBestConfig=true;
+	else std::cout << "No best point found (is filler ... ) " << std::endl;
 	break;
-      } else {
-	std::cout << "No best point found (is filler ... ) " << std::endl;
-      }
+      } 
     }
   } else {
     std::cout << "No last best point " << std::endl;
     ExistsBestConfig=false;
   }
   
-  std::cout << "Done loading configuration" << std::endl;
+  std::cout << "Done loading configuration (ExistsBestConfig=" << ExistsBestConfig<< ")" << std::endl;
+  
 }
 
 void DefineParameters() {
@@ -188,10 +127,13 @@ void DefineParameters() {
   
   if(ExistsBestConfig) {
     // only check in the vicinity which is defined as one parameter being varied by up to 10% of the full range   (so if we're at 50 of [-2000,2000] the new parameter will be in [-150,250] )
+    /*
     int ParVary=randgen->Uniform(0,20);
     std::cout << "There is a \"best point\", and we'll vary parameter " << ParVary << " which is currently " << pMSSMpars[ParVary] << " . The new value for it is ";
     pMSSMpars[ParVary]=VaryAroundPoint(pMSSMpars[ParVary],ParVary);
     std::cout << pMSSMpars[ParVary] << std::endl;
+    */
+    GetPointFromDeformedNDimensionalSphere(pMSSMpars,20, randgen);
   } else {
     // there is no "best point", need to vary all parameters freely.
     for(int i=0;i<20;i++) pMSSMpars[i]=GetRandomParameter(i);
@@ -381,7 +323,7 @@ int main() {
   randgen = new TRandom3(0);
   
   while(!HaveValidSLHA&&nAttempts<10000) {
-    std::cout << "\033[1;34m Attempt " << nAttempts << std::endl;
+    std::cout << "\033[1;34m Attempt " << nAttempts << "\033[0m" << std::endl;
 
     HaveValidSLHA=false;
     
