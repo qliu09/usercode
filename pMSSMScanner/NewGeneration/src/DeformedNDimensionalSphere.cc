@@ -19,6 +19,10 @@ float GetNewPoint(float initial, int iPar, float weight,TRandom3 *randgen) {
   float newpoint=initial;
   bool IsNewPointOk=false;
   while(!IsNewPointOk) {
+      if(initial<lowrange||initial>highrange) {
+          std::cerr << " The initial point (" << initial << ") for parameter " << iPar << " is outside the allowed range [" << lowrange << "," << highrange << "] . Will reset initial point to lower boundary of range (" << lowrange << ")";
+          initial=lowrange;
+      }
     float addon=randgen->Uniform(lowrange,highrange);
     int sign=1;
     if(randgen->Uniform(0,1)>0.5) sign=-1;
