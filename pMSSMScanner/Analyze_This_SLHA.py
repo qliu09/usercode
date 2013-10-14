@@ -10,21 +10,22 @@ py=0
 lpx=0
 lpy=0
 lpz=0
+met=0
 lE=0
 nj=0
 ht=0
 NBtags=0
 leptons=[]
 
-NGenEvents=100000
+NGenEvents=10000
 
-NRounds=10
+NRounds=1
 
-DoIllustration=False## if this is set to true you get nice plots for each signal point (but the script takes longer)
+DoIllustration=True## if this is set to true you get nice plots for each signal point (but the script takes longer)
 
 cutoff=0.05 ## cutoff probability for individual compatibility (e.g. 5% = 0.05)
 
-
+NEvent=0
 
 
 def GenerateConfigFile(slhapath):
@@ -73,7 +74,7 @@ def GenerateConfigFile(slhapath):
   f.write("\n                                                                                             'MSTP(162) = 68',")
   f.write("\n                                                                                             'MSTP(163) = 69'),")
   f.write('\n')
-  f.write("\n                                                             SLHAParameters = cms.vstring('SLHAFILE = "+slhapath[slhapath.find("UserCode"):]+"'),") # starting at UserCode/
+  f.write("\n                                                             SLHAParameters = cms.vstring('SLHAFILE = "+slhapath[slhapath.find("usercode"):]+"'),") # starting at UserCode/
   f.write("\n                                                             parameterSets = cms.vstring('pythiaUESettings',")
   f.write("\n                                                                                         'processParameters','SLHAParameters')")
   f.write('\n')
@@ -94,7 +95,6 @@ def GenerateConfigFile(slhapath):
   f.write('\n')
   f.write('\n')
   f.close()
-
 
 def GenerateLHEFile(slhapath):
    print "Generating LHE file from "+str(slhapath)
@@ -127,19 +127,32 @@ MllhistoHighMass.Sumw2();
 MllhistoHighMass.GetXaxis().SetTitle("m_{ll}")
 MllhistoHighMass.GetXaxis().CenterTitle()
 
+Mllhisto = ROOT.TH1F("Mllhisto","",56,20,300);
+Mllhisto.SetStats(0)
+Mllhisto.Sumw2();
+Mllhisto.GetXaxis().SetTitle("m_{ll}")
+Mllhisto.GetXaxis().CenterTitle()
+
 HistoCentrality = ROOT.TH1F("HistoCentrality","",12,0.0,2.4);
 HistoCentrality.SetStats(0)
 HistoCentrality.Sumw2();
 HistoCentrality.GetXaxis().SetTitle("min(|#eta_{1}|,|#eta_{2})")
 HistoCentrality.GetXaxis().CenterTitle()
 
-HistoBTagMultiplicity = ROOT.TH1F("HistoBTagMultiplicity","",7,-0.5,6.5);
+HistoBTagMultiplicity = ROOT.TH1F("HistoBTagMultiplicity","",5,-0.5,4.5);
 HistoBTagMultiplicity.SetStats(0)
 HistoBTagMultiplicity.Sumw2();
 HistoBTagMultiplicity.GetXaxis().SetTitle("N_{btags}")
 HistoBTagMultiplicity.GetXaxis().CenterTitle()
 
-Methisto = ROOT.TH1F("Methisto","",40,100,500);
+HistoJetMultiplicity = ROOT.TH1F("HistoJetMultiplicity","",5,1.5,6.5);
+HistoJetMultiplicity.SetStats(0)
+HistoJetMultiplicity.Sumw2();
+HistoJetMultiplicity.GetXaxis().SetTitle("N_{jets}")
+HistoJetMultiplicity.GetXaxis().CenterTitle()
+
+
+Methisto = ROOT.TH1F("Methisto","",20,100,300);
 Methisto.SetStats(0)
 Methisto.Sumw2();
 Methisto.GetXaxis().SetTitle("m_{ll}")
@@ -147,8 +160,8 @@ Methisto.GetXaxis().CenterTitle()
 
 
 def StoreEvent():
-    global px, py, lpx,lpy,lpz,lE,nj,leptons,NBtags
-    global HistoCentrality,HistoBTagMultiplicity,MllhistoLowMass,MllhistoZmass,MllhistoHighMass
+    global px, py, lpx,lpy,lpz,lE,nj,leptons,NBtags,met
+    global HistoCentrality,HistoBTagMultiplicity,Mllhisto,HistoJetMultiplicity,MllhistoLowMass,MllhistoZmass,MllhistoHighMass
     
     i1=0
     i2=0
@@ -202,36 +215,44 @@ def StoreEvent():
       Weight=-1.0
     
     BTagMultiplicity=NBtags
-    NBtags=0
+    JetMultiplicity=nj
 
     if mll > 0:
+#            print "NJ="+str(nj)+" and met="+str(met)
             if nj>=3 and met>100:
-              if mll>20 and mll<70:
-                    HistoCentrality.Fill(max(abs(eta1),abs(eta2)),Weight)
+#              if mll>20 and mll<70:
+#                    HistoCentrality.Fill(max(abs(eta1),abs(eta2)),Weight)
               if centrality=="central" and mll>20 and mll<70:
                     HistoBTagMultiplicity.Fill(BTagMultiplicity,Weight)
-              if centrality=="central":
-                    if(mll>=20 and mll<=80) :
-                        MllhistoLowMass.Fill(mll,Weight)
-                    if(mll>=80 and mll<=100) :
-                        MllhistoZmass.Fill(mll,Weight)
-                    if(mll>100) :
-                        MllhistoHighMass.Fill(mll,Weight);
+                    HistoJetMultiplicity.Fill(JetMultiplicity,Weight)
+                    Mllhisto.Fill(mll,Weight)
+                    Methisto.Fill(met,Weight)
+#              if centrality=="central":
+#                    if(mll>=20 and mll<=80) :
+#                        MllhistoLowMass.Fill(mll,Weight)
+#                    if(mll>=80 and mll<=100) :
+#                        MllhistoZmass.Fill(mll,Weight)
+#                    if(mll>100) :
+#                        MllhistoHighMass.Fill(mll,Weight);
             if nj>=2 and met>150:
-                if mll>20 and mll<70:
-                    HistoCentrality.Fill(max(abs(eta1),abs(eta2)),Weight)
+#                if mll>20 and mll<70:
+#                    HistoCentrality.Fill(max(abs(eta1),abs(eta2)),Weight)
                 if centrality=="central" and mll>20 and mll<70:
                     HistoBTagMultiplicity.Fill(BTagMultiplicity,Weight)
-                if centrality=="central":
-                    if(mll>=20 and mll<=80) :
-                            MllhistoLowMass.Fill(mll,Weight)
-                    if(mll>=80 and mll<=100) :
-                            MllhistoZmass.Fill(mll,Weight)
-                    if(mll>100) :
-                            MllhistoHighMass.Fill(mll,Weight)
+                    HistoJetMultiplicity.Fill(JetMultiplicity,Weight)
+                    Methisto.Fill(met,Weight)
+                    Mllhisto.Fill(mll,Weight)
+#                if centrality=="central":
+#                    if(mll>=20 and mll<=80) :
+#                            MllhistoLowMass.Fill(mll,Weight)
+#                    if(mll>=80 and mll<=100) :
+#                            MllhistoZmass.Fill(mll,Weight)
+#                    if(mll>100) :
+#                            MllhistoHighMass.Fill(mll,Weight)
+                    
 
 def ProcessEvent():
-  global px, py, lpx,lpy,lpz,lE,nj,leptons
+  global px, py, lpx,lpy,lpz,lE,nj,leptons, NBtags, met, mll
     
   if nj>=2 and len(leptons)>=2:
       StoreEvent()
@@ -244,17 +265,20 @@ def ProcessEvent():
   nl=0
   nj=0
   ht=0
+  nj=0
+  met=0
+  mll=0
   NBtags=0
   leptons=[]
 
 def ProcessLine(line):
 #  print "Processing line" 
-  global px, py, lpx, lpy, lpz, lE, nj, leptons, ht, NBtags
+  global px, py, lpx, lpy, lpz, lE, nj, leptons, ht, NBtags, NEvent
+  
+  NEvent+=1
 
   
   tarray=line.split(" ")
-#  print line
-#  print tarray
   array=[]
   for entry in tarray:
     if len(entry) == 0:
@@ -276,7 +300,6 @@ def ProcessLine(line):
     # this is an LSP !
     px+=ParticlePx
     py+=ParticlePy
-    #print "LSP !!!!!!!!        "+str(line)
     
   if(abs(ParticleId)==5 and pow(pow(ParticlePx,2)+pow(ParticlePy,2),0.5)>40 ) :  ## this is a b (we're counting any b's with Pt>40)
       NBtags+=1
@@ -297,18 +320,19 @@ def ProcessLine(line):
 
 
   if abs(ParticleId)==11 or abs(ParticleId)==13: #don't consider taus
-      if(pow(ParticlePx*ParticlePx+ParticlePy*ParticlePy,0.5)>20):
+      if(pow(ParticlePx*ParticlePx+ParticlePy*ParticlePy,0.5)>20) :
           lepton={}
           lepton["px"]=ParticlePx
           lepton["py"]=ParticlePy
           lepton["pz"]=ParticlePz
           lepton["E"]=ParticleE
           lepton["id"]=ParticleId
-          leptons.append(lepton)
-
-          #print "ACCEPTED LEPTON (Pt="+str(pow(ParticlePx*ParticlePx+ParticlePy*ParticlePy,0.5))+"!!!!!!!!        "+str(line)
-       #else:
-          #print "REJECTED LEPTON (Pt="+str(pow(ParticlePx*ParticlePx+ParticlePy*ParticlePy,0.5))+"!!!!!!!!        "+str(line)
+          p1 = ROOT.TLorentzVector()
+          p1.SetPxPyPzE(lepton["px"],lepton["py"],lepton["pz"],lepton["E"])
+          eta1=p1.Eta()
+#          print "Looking at a lepton with eta "+str(eta1)+" in event "+str(NEvent)
+          if abs(eta1) < 1.4:    ## CENTRAL REGION ONLY!
+	    leptons.append(lepton)
 
 def FillHistogram(filename):
   print "Filling histogram for "+filename
@@ -361,29 +385,76 @@ def Illustrate(ThisHisto,RefHisto,filename,KSP) :
     Decoration.Draw()
     can.SaveAs(filename.replace(".","_")+"_"+str(ThisHisto.GetName())+".png")
 
+    
+def FlipOnOverFlowBin():
+  global HistoBTagMultiplicity, HistoJetMultiplicity, Mllhisto, Methisto
+
+  HistoBTagMultiplicity.SetBinContent(HistoBTagMultiplicity.GetNbinsX(),HistoBTagMultiplicity.GetBinContent(HistoBTagMultiplicity.GetNbinsX())+HistoBTagMultiplicity.GetBinContent(HistoBTagMultiplicity.GetNbinsX()+1))
+  HistoBTagMultiplicity.SetBinContent(HistoBTagMultiplicity.GetNbinsX()+1,0)
+  HistoBTagMultiplicity.SetBinError(HistoBTagMultiplicity.GetNbinsX(),math.sqrt(pow(HistoBTagMultiplicity.GetBinError(HistoBTagMultiplicity.GetNbinsX()),2)+pow(HistoBTagMultiplicity.GetBinError(HistoBTagMultiplicity.GetNbinsX()+1),2)))
+  HistoBTagMultiplicity.SetBinError(HistoBTagMultiplicity.GetNbinsX()+1,0)
+
+  HistoJetMultiplicity.SetBinContent(HistoJetMultiplicity.GetNbinsX(),HistoJetMultiplicity.GetBinContent(HistoJetMultiplicity.GetNbinsX())+HistoJetMultiplicity.GetBinContent(HistoJetMultiplicity.GetNbinsX()+1))
+  HistoJetMultiplicity.SetBinContent(HistoJetMultiplicity.GetNbinsX()+1,0)
+  HistoJetMultiplicity.SetBinError(HistoJetMultiplicity.GetNbinsX(),math.sqrt(pow(HistoJetMultiplicity.GetBinError(HistoJetMultiplicity.GetNbinsX()),2)+pow(HistoJetMultiplicity.GetBinError(HistoJetMultiplicity.GetNbinsX()+1),2)))
+  HistoJetMultiplicity.SetBinError(HistoJetMultiplicity.GetNbinsX()+1,0)
+
+  Mllhisto.SetBinContent(Mllhisto.GetNbinsX(),Mllhisto.GetBinContent(Mllhisto.GetNbinsX())+Mllhisto.GetBinContent(Mllhisto.GetNbinsX()+1))
+  Mllhisto.SetBinContent(Mllhisto.GetNbinsX()+1,0)
+  Mllhisto.SetBinError(Mllhisto.GetNbinsX(),math.sqrt(pow(Mllhisto.GetBinError(Mllhisto.GetNbinsX()),2)+pow(Mllhisto.GetBinError(Mllhisto.GetNbinsX()+1),2)))
+  Mllhisto.SetBinError(Mllhisto.GetNbinsX()+1,0)
+
+  Methisto.SetBinContent(Methisto.GetNbinsX(),Methisto.GetBinContent(Methisto.GetNbinsX())+Methisto.GetBinContent(Methisto.GetNbinsX()+1))
+  Methisto.SetBinContent(Methisto.GetNbinsX()+1,0)
+  Methisto.SetBinError(Methisto.GetNbinsX(),math.sqrt(pow(Methisto.GetBinError(Methisto.GetNbinsX()),2)+pow(Methisto.GetBinError(Methisto.GetNbinsX()+1),2)))
+  Methisto.SetBinError(Methisto.GetNbinsX()+1,0)
+
+
+
 def ComputeCompatibility(filename,slhaname):
-  global METhisto,Mllhisto,DoIllustration
+  global Methisto,Mllhisto,DoIllustration,HistoBTagMultiplicity,HistoJetMultiplicity
   
-  RefFile = ROOT.TFile("NewReferenceDiffs.root")
+  RefFile = ROOT.TFile("DifferentialDistributions.root")
     
-  RefHistoCentrality = RefFile.Get("HistoCentrality")
-  KSP_Centrality = RefHistoCentrality.KolmogorovTest(HistoCentrality)
+#  RefHistoCentrality = RefFile.Get("HistoCentrality")
+#  KSP_Centrality = RefHistoCentrality.KolmogorovTest(HistoCentrality)
     
-  RefHistoBTagMultiplicity = RefFile.Get("HistoBTagMultiplicity")
+ 
+  FlipOnOverFlowBin() 
+ 
+  print "The histograms contain the following number of events   (btag/jet/mll/met):"
+  print HistoBTagMultiplicity.Integral()
+  print HistoJetMultiplicity.Integral()
+  print Mllhisto.Integral()
+  print Methisto.Integral()
+  
+  print "Looking at btag"
+  RefHistoBTagMultiplicity = RefFile.Get("dBTag")
   KSP_BTag = RefHistoBTagMultiplicity.KolmogorovTest(HistoBTagMultiplicity)
         
-  RefMllhistoLowMass = RefFile.Get("MllhistoLowMass")
-  KSP_LowMass = RefMllhistoLowMass.KolmogorovTest(MllhistoLowMass)
+  print "Looking at jets"
+  RefHistoJetMultiplicity = RefFile.Get("dJet")
+  KSP_Jet = RefHistoJetMultiplicity.KolmogorovTest(HistoJetMultiplicity)
         
-  RefMllhistoZmass = RefFile.Get("MllhistoZmass")
-  KSP_ZMass = RefMllhistoZmass.KolmogorovTest(MllhistoZmass)
-      
-  RefMllhistoHighMass = RefFile.Get("MllhistoHighMass")
-  KSP_HighMass = RefMllhistoHighMass.KolmogorovTest(MllhistoHighMass)
-    
-  KSP_Mass = pow(    pow(KSP_LowMass,3) * KSP_ZMass * KSP_HighMass , 1/5.)
+  print "Looking at mll"
+  RefMllhisto = RefFile.Get("dMll")
+  KSP_Mass = RefMllhisto.KolmogorovTest(Mllhisto)
   
-  KSP_Final = pow ( pow(KSP_Mass,3) * KSP_Centrality * KSP_BTag , 1/5.0)
+  print "Looking at met"
+  RefMEThisto = RefFile.Get("dMET")
+  KSP_MET  = RefMEThisto.KolmogorovTest(Methisto)
+  
+  print "Compatibilities found: "
+  print "Mll: "+str(KSP_Mass)
+  print "BTag: "+str(KSP_BTag)
+  print "JET: "+str(KSP_Jet)
+  print "MET: "+str(KSP_MET)
+        
+#  KSP_Mass = pow(    pow(KSP_LowMass,3) * KSP_ZMass * KSP_HighMass , 1/5.)
+  
+#  KSP_Final = pow ( pow(KSP_Mass,3) * KSP_Centrality * KSP_BTag , 1/5.0)
+  
+  KSP_Final = KSP_BTag + KSP_Jet + KSP_Mass + KSP_MET
   
   PResult=str(("{0:.10f}".format(KSP_Final)))
   PResult="0p"+PResult[2:]
@@ -396,11 +467,14 @@ def ComputeCompatibility(filename,slhaname):
   kaswrite.write(str(KSP_Final))
   kaswrite.close()
   
-  print "Compatibility in low mass: "+str(KSP_LowMass)
-  print "Compatibility in Z mass: "+str(KSP_ZMass)
-  print "Compatibility in high mass: "+str(KSP_HighMass)
-  print "Compatibility in centrality: "+str(KSP_Centrality)
+#  print "Compatibility in low mass: "+str(KSP_LowMass)
+#  print "Compatibility in Z mass: "+str(KSP_ZMass)
+#  print "Compatibility in high mass: "+str(KSP_HighMass)
+  print "Compatibility in mass range: "+str(KSP_Mass)
+  print "Compatibility in NJets: "+str(KSP_Jet)
+#  print "Compatibility in centrality: "+str(KSP_Centrality)
   print "Compatibility in BTag: "+str(KSP_BTag)
+  print "Compatibility in MET: "+str(KSP_MET)
   
   print "Combined Kolmogorov-Smirnov probability is "+str(KSP_Final)
   
@@ -410,11 +484,13 @@ def ComputeCompatibility(filename,slhaname):
   # now draw this!
   print "NEED TO UPDATE PLOTTING FOR FOUR REGIONS"
 
-  Illustrate(HistoCentrality,RefHistoCentrality,slhaname,KSP_Centrality)
+#  Illustrate(HistoCentrality,RefHistoCentrality,slhaname,KSP_Centrality)
   Illustrate(HistoBTagMultiplicity,RefHistoBTagMultiplicity,slhaname,KSP_BTag)
-  Illustrate(MllhistoLowMass,RefMllhistoLowMass,slhaname,KSP_LowMass)
-  Illustrate(MllhistoZmass,RefMllhistoZmass,slhaname,KSP_ZMass)
-  Illustrate(MllhistoHighMass,RefMllhistoHighMass,slhaname,KSP_HighMass)
+  Illustrate(Mllhisto,RefMllhisto,slhaname,KSP_Mass)
+  Illustrate(Methisto,RefMEThisto,slhaname,KSP_MET)
+  Illustrate(HistoJetMultiplicity,RefHistoJetMultiplicity,slhaname,KSP_Jet)
+#  Illustrate(MllhistoZmass,RefMllhistoZmass,slhaname,KSP_ZMass)
+#  Illustrate(MllhistoHighMass,RefMllhistoHighMass,slhaname,KSP_HighMass)
 
   RefFile.Close()
   
