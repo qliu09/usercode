@@ -7,9 +7,6 @@ import math
 import random
 px=0
 py=0
-lpx=0
-lpy=0
-lpz=0
 met=0
 lE=0
 nj=0
@@ -17,11 +14,11 @@ ht=0
 NBtags=0
 leptons=[]
 
-NGenEvents=10000
+NGenEvents=100000
 
 NRounds=1
 
-DoIllustration=True## if this is set to true you get nice plots for each signal point (but the script takes longer)
+DoIllustration=False## if this is set to true you get nice plots for each signal point (but the script takes longer)
 
 cutoff=0.05 ## cutoff probability for individual compatibility (e.g. 5% = 0.05)
 
@@ -31,8 +28,6 @@ NEvent=0
 def GenerateConfigFile(slhapath):
   
   f = open("This_SLHA_To_LHE.py",'w')
-
-    
   f.write('\nimport FWCore.ParameterSet.Config as cms')
   f.write('\n')
   f.write('\nprocess = cms.Process("PROD")')
@@ -101,8 +96,8 @@ def GenerateLHEFile(slhapath):
    ConfFile=GenerateConfigFile(slhapath)
    LHEPATH="InvalidLHEPath"
    lines = commands.getoutput("cmsRun This_SLHA_To_LHE.py | tee "+slhapath+".log")
-   for line in lines.splitlines():
-     print " LHE file generation : "+line
+#   for line in lines.splitlines():
+#     print " LHE file generation : "+line
    print "Done generating LHE file"
    return "fort.69"
 
@@ -160,11 +155,14 @@ Methisto.GetXaxis().CenterTitle()
 
 
 def StoreEvent():
-    global px, py, lpx,lpy,lpz,lE,nj,leptons,NBtags,met
+    global NEvent
+#    print "__________________________________________________________________"
+#    print "Found two leptons in event "+str(NEvent)
+    global px, py, lE, nj, leptons, NBtags, met
     global HistoCentrality,HistoBTagMultiplicity,Mllhisto,HistoJetMultiplicity,MllhistoLowMass,MllhistoZmass,MllhistoHighMass
     
     i1=0
-    i2=0
+    i2=-1
     id1=leptons[0]["id"]
     id2=0
     
@@ -175,9 +173,9 @@ def StoreEvent():
           i2=i
           break
 
-    eta1=0.0
-    eta2=0.0
-
+    if i2<0:
+      return
+#    print "The two leptons are "+str(id1)+" and "+str(id2)
     p1 = ROOT.TLorentzVector()
     p1.SetPxPyPzE(leptons[0]["px"],leptons[0]["py"],leptons[0]["pz"],leptons[0]["E"])
     eta1=p1.Eta()
@@ -185,20 +183,21 @@ def StoreEvent():
     p2 = ROOT.TLorentzVector()
     p2.SetPxPyPzE(leptons[i2]["px"],leptons[i2]["py"],leptons[i2]["pz"],leptons[i2]["E"])
     eta2=p2.Eta()
+    
+#    print "The leptons have pt "+str(p1.Pt())+" and "+str(p2.Pt())+" and eta "+str(p1.Eta())+" and "+str(p2.Eta())
+#    print leptons[0]
+#    print leptons[i2]
 
     flav="SF"
     if abs(id1)==abs(id2):
       flav="SF"
-    #      print "Same flavor"
     else:
       flav="OF"
 
     met=pow(px*px+py*py,0.5)
     mll=(p1+p2).M()
+#    print "Mass : "+str(mll)
     
-#    print "Met="+str(met)
-
-    #print "Leptons are at "+str(eta1)+" and at "+str(eta2)
     centrality="invalid"
     if max(abs(eta1),abs(eta2)) > 1.4:
         centrality="forward"
@@ -218,50 +217,29 @@ def StoreEvent():
     JetMultiplicity=nj
 
     if mll > 0:
-#            print "NJ="+str(nj)+" and met="+str(met)
             if nj>=3 and met>100:
-#              if mll>20 and mll<70:
-#                    HistoCentrality.Fill(max(abs(eta1),abs(eta2)),Weight)
+              if centrality=="central":
+                    Mllhisto.Fill(mll,Weight)
               if centrality=="central" and mll>20 and mll<70:
                     HistoBTagMultiplicity.Fill(BTagMultiplicity,Weight)
                     HistoJetMultiplicity.Fill(JetMultiplicity,Weight)
                     Mllhisto.Fill(mll,Weight)
                     Methisto.Fill(met,Weight)
-#              if centrality=="central":
-#                    if(mll>=20 and mll<=80) :
-#                        MllhistoLowMass.Fill(mll,Weight)
-#                    if(mll>=80 and mll<=100) :
-#                        MllhistoZmass.Fill(mll,Weight)
-#                    if(mll>100) :
-#                        MllhistoHighMass.Fill(mll,Weight);
             if nj>=2 and met>150:
-#                if mll>20 and mll<70:
-#                    HistoCentrality.Fill(max(abs(eta1),abs(eta2)),Weight)
+                if centrality=="central":
+                    Mllhisto.Fill(mll,Weight)
                 if centrality=="central" and mll>20 and mll<70:
                     HistoBTagMultiplicity.Fill(BTagMultiplicity,Weight)
                     HistoJetMultiplicity.Fill(JetMultiplicity,Weight)
                     Methisto.Fill(met,Weight)
-                    Mllhisto.Fill(mll,Weight)
-#                if centrality=="central":
-#                    if(mll>=20 and mll<=80) :
-#                            MllhistoLowMass.Fill(mll,Weight)
-#                    if(mll>=80 and mll<=100) :
-#                            MllhistoZmass.Fill(mll,Weight)
-#                    if(mll>100) :
-#                            MllhistoHighMass.Fill(mll,Weight)
-                    
 
 def ProcessEvent():
-  global px, py, lpx,lpy,lpz,lE,nj,leptons, NBtags, met, mll
+  global px, py, nj,leptons, NBtags, met, mll
     
   if nj>=2 and len(leptons)>=2:
       StoreEvent()
   px=0
   py=0
-  lE=0
-  lpx=0
-  lpy=0
-  lpz=0
   nl=0
   nj=0
   ht=0
@@ -272,11 +250,7 @@ def ProcessEvent():
   leptons=[]
 
 def ProcessLine(line):
-#  print "Processing line" 
-  global px, py, lpx, lpy, lpz, lE, nj, leptons, ht, NBtags, NEvent
-  
-  NEvent+=1
-
+  global px, py, nj, leptons, ht, NBtags, NEvent
   
   tarray=line.split(" ")
   array=[]
@@ -321,6 +295,7 @@ def ProcessLine(line):
 
   if abs(ParticleId)==11 or abs(ParticleId)==13: #don't consider taus
       if(pow(ParticlePx*ParticlePx+ParticlePy*ParticlePy,0.5)>20) :
+#          print "Found a lepton in event "+str(NEvent)+" on line with "+line
           lepton={}
           lepton["px"]=ParticlePx
           lepton["py"]=ParticlePy
@@ -335,6 +310,8 @@ def ProcessLine(line):
 	    leptons.append(lepton)
 
 def FillHistogram(filename):
+  global NEvent
+
   print "Filling histogram for "+filename
   lhefile = open(filename)
   ActionStarted=False
@@ -347,14 +324,12 @@ def FillHistogram(filename):
       ActionStarted=True
       continue
     if line.find("</event>") > -1 :
-        #print " ******************* EVENT ENDED "
       ProcessEvent()
-        #print "Time to clean event"
+      NEvent+=1
       continue
     if not ActionStarted:
       continue
     
-    #print line
     ProcessLine(line)
   
 def Illustrate(ThisHisto,RefHisto,filename,KSP) :
@@ -415,10 +390,6 @@ def ComputeCompatibility(filename,slhaname):
   global Methisto,Mllhisto,DoIllustration,HistoBTagMultiplicity,HistoJetMultiplicity
   
   RefFile = ROOT.TFile("DifferentialDistributions.root")
-    
-#  RefHistoCentrality = RefFile.Get("HistoCentrality")
-#  KSP_Centrality = RefHistoCentrality.KolmogorovTest(HistoCentrality)
-    
  
   FlipOnOverFlowBin() 
  
@@ -428,23 +399,19 @@ def ComputeCompatibility(filename,slhaname):
   print Mllhisto.Integral()
   print Methisto.Integral()
   
-  print "Looking at btag"
   RefHistoBTagMultiplicity = RefFile.Get("dBTag")
   KSP_BTag = RefHistoBTagMultiplicity.KolmogorovTest(HistoBTagMultiplicity)
         
-  print "Looking at jets"
   RefHistoJetMultiplicity = RefFile.Get("dJet")
   KSP_Jet = RefHistoJetMultiplicity.KolmogorovTest(HistoJetMultiplicity)
         
-  print "Looking at mll"
   RefMllhisto = RefFile.Get("dMll")
   KSP_Mass = RefMllhisto.KolmogorovTest(Mllhisto)
   
-  print "Looking at met"
   RefMEThisto = RefFile.Get("dMET")
   KSP_MET  = RefMEThisto.KolmogorovTest(Methisto)
   
-  print "Compatibilities found: "
+  print "Compatibilities: "
   print "Mll: "+str(KSP_Mass)
   print "BTag: "+str(KSP_BTag)
   print "JET: "+str(KSP_Jet)
@@ -477,6 +444,14 @@ def ComputeCompatibility(filename,slhaname):
   print "Compatibility in MET: "+str(KSP_MET)
   
   print "Combined Kolmogorov-Smirnov probability is "+str(KSP_Final)
+  
+  OutFile = ROOT.TFile("GeneratedDistributions_v2.root","RECREATE")
+  OutFile.cd()
+  HistoBTagMultiplicity.Write()
+  Mllhisto.Write()
+  Methisto.Write()
+  HistoJetMultiplicity.Write()
+  OutFile.Close()
   
   if not DoIllustration:
     return KSP_Final
@@ -528,7 +503,7 @@ def CrunchNumbersForLHEFile(filename,slhaname):
 def AnalyzeThisSLHA(slhapath):
   retval=0.0
   for i in range(0,NRounds):
-    print "Now doing round "+str(i)+" of generating an LHE file (doing it in "+str(NRounds)+" rounds to reduce sandbox usage)"
+    print "Now doing round "+str(i+1)+" of generating an LHE file (doing it in "+str(NRounds)+" rounds to reduce sandbox usage)"
     LHEFile = GenerateLHEFile(slhapath)
     retval=CrunchNumbersForLHEFile(LHEFile,slhapath)[0]
     commands.getoutput("rm "+LHEFile)
