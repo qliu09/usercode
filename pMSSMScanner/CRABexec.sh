@@ -163,7 +163,7 @@ function check_time {
 
 MISSIONNAME="TESTING_v1"
 
-REFDIR="/shome/buchmann/Year_Of_SUSY_Discovery/NewSimulation/CMSSW_5_2_6/src/UserCode/Scans/LHECruncher"
+REFDIR="/shome/buchmann/Year_Of_SUSY_Discovery/NewSimulation/CMSSW_5_2_6/src/usercode/pMSSMScanner/"
 
 
 
@@ -188,9 +188,8 @@ rm -f Candidates/*
 rm -f MyParameters.txt
 rm -f KS.txt
 cp ${REFDIR}/MicroSuggestion.exec .
-cp ${REFDIR}/superiso_v3.3/slha.x .
+cp /shome/buchmann/Year_Of_SUSY_Discovery/NewSimulation/CMSSW_5_2_6/src/UserCode/Scans/LHECruncher/superiso_v3.3/slha.x .
 cp ${REFDIR}/IsPointAcceptable.exec .
-cp ${REFDIR}/referenceDiffs.root .
 cp ${REFDIR}/NewReferenceDiffs.root .
 
 #  _____ _               ___  
@@ -235,14 +234,14 @@ for model in {1..10000}; do
     echo "Boundaried not respected, rejeting this point (response was $Response)"
   else
     SLHAname="`date +%H_%M_%S_%N`__${RANDOM}.slha"
-    mv ${WORKDIR}/susyhit_slha.out ${REFDIR}/$SLHAname
-    echo "The output (susyhit_slha_out) is now called $SLHAname and is at ${REFDIR}/$SLHAname : "
-    ls -ltrh ${REFDIR}/$SLHAname
-    python ${REFDIR}/Analyze_This_SLHA.py ${REFDIR}/$SLHAname
+    mv ${WORKDIR}/susyhit_slha.out /shome/buchmann/Year_Of_SUSY_Discovery/NewSimulation/CMSSW_5_2_6/src/UserCode/Scans/LHECruncher/$SLHAname
+    echo "The output (susyhit_slha_out) is now called $SLHAname and is at /shome/buchmann/Year_Of_SUSY_Discovery/NewSimulation/CMSSW_5_2_6/src/UserCode/Scans/LHECruncher/$SLHAname : "
+    ls -ltrh /shome/buchmann/Year_Of_SUSY_Discovery/NewSimulation/CMSSW_5_2_6/src/UserCode/Scans/LHECruncher/$SLHAname
+    python ${REFDIR}/Analyze_This_SLHA.py /shome/buchmann/Year_Of_SUSY_Discovery/NewSimulation/CMSSW_5_2_6/src/UserCode/Scans/LHECruncher/$SLHAname
     Marker=`cat Marker.txt`
     ${REFDIR}/StoreThisPoint.exec $Marker
     NOW=`date +%Y%m%d_%H%M%S`
-    mv ${RELEASE}/$SLHAname $WORKDIR/Candidates/${Marker}_${1}_${NOW}
+    mv /shome/buchmann/Year_Of_SUSY_Discovery/NewSimulation/CMSSW_5_2_6/src/UserCode/Scans/LHECruncher/$SLHAname $WORKDIR/Candidates/${Marker}_${1}_${NOW}
   fi
   
 done
