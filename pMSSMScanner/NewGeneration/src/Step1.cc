@@ -388,7 +388,7 @@ int main() {
   
   randgen = new TRandom3(0);
   
-  while(!HaveValidSLHA&&nAttempts<10000000) {
+  while(!HaveValidSLHA&&nAttempts<10000) {
     std::cout << "\033[1;34m Attempt " << nAttempts << "\033[0m " << std::endl;
 
     HaveValidSLHA=false;
