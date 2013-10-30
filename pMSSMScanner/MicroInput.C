@@ -1,11 +1,12 @@
 #include <iostream>
+#include <fstream>
 #include <stdlib.h>
 
 using std::endl;
 using std::cout;
 
 void CreateMicroMegasInput(float pMSSMParameters[20]) {
-  ofstream SusPectCard;
+  std::ofstream SusPectCard;
   SusPectCard.open("genPoint.dat");  
   
   SusPectCard << "alfEMZ 0.007818061" << endl;
