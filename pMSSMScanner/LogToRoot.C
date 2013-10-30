@@ -38,15 +38,21 @@ float Cond(std::vector<std::string> v, int index){
 
 void InterpretLine(std::string line) {
     
-    
-    
     std::vector<std::string> v;
     
     split( line, v, ' ' );
     
+    Problematic=false;
+    
     for(int i=0;i<20;i++) {
-        if(v.size()>i) pMSSMpars[i]=atof(v[i].c_str());
-        else pMSSMpars[i]=-1;
+        if(v.size()>i) {
+	  pMSSMpars[i]=atof(v[i].c_str());
+	}
+	if(pMSSMpars[i]==-1 || !(v.size()>i)) {
+	  pMSSMpars[i]=-1;
+	  Problematic=true;
+	  cout << "Found a problematic line" << endl;
+	}
     }
     
     SLHAValid=Cond(v,20);
@@ -133,7 +139,7 @@ int main() {
           getline (LogIn,line);
           InterpretLine(line);
           entries++;
-          if(entries%100==0) std::cout << "Working on entry " << entries << std::endl;
+//          if(entries%100==0) std::cout << "Working on entry " << entries << std::endl;
           if(Problematic) continue;
           tree->Fill();
       }
@@ -141,9 +147,9 @@ int main() {
   
   std::cout << " Whole file has " << entries << " entries" << std::endl;
     
-  while(LogIn >> pMSSMpars[0] >> pMSSMpars[1] >> pMSSMpars[2] >> pMSSMpars[3] >> pMSSMpars[4] >> pMSSMpars[5] >> pMSSMpars[6] >> pMSSMpars[7] >> pMSSMpars[8] >> pMSSMpars[9] >> pMSSMpars[10] >> pMSSMpars[11] >> pMSSMpars[12] >> pMSSMpars[13] >> pMSSMpars[14] >> pMSSMpars[15] >> pMSSMpars[16] >> pMSSMpars[17] >> pMSSMpars[18] >> pMSSMpars[19] >> SLHAValid >> HiggsMass >> Satisfies_bsgamma >> Satisfies_gm2 >> Satisfies_Bsmumu >> Satisfies_Higgs >> Satisfies_SUSY >> Satisfies_LSP >> Satisfies_Top >> Satisfies_Mbmb >> Satisfies_Alphas >> Satisfies_BsGamma >> Satisfies_RBtaunu >> Satisfies_BsMuMu >> Compatibility) {
-      tree->Fill();
-  }
+//  while(LogIn >> pMSSMpars[0] >> pMSSMpars[1] >> pMSSMpars[2] >> pMSSMpars[3] >> pMSSMpars[4] >> pMSSMpars[5] >> pMSSMpars[6] >> pMSSMpars[7] >> pMSSMpars[8] >> pMSSMpars[9] >> pMSSMpars[10] >> pMSSMpars[11] >> pMSSMpars[12] >> pMSSMpars[13] >> pMSSMpars[14] >> pMSSMpars[15] >> pMSSMpars[16] >> pMSSMpars[17] >> pMSSMpars[18] >> pMSSMpars[19] >> SLHAValid >> HiggsMass >> Satisfies_bsgamma >> Satisfies_gm2 >> Satisfies_Bsmumu >> Satisfies_Higgs >> Satisfies_SUSY >> Satisfies_LSP >> Satisfies_Top >> Satisfies_Mbmb >> Satisfies_Alphas >> Satisfies_BsGamma >> Satisfies_RBtaunu >> Satisfies_BsMuMu >> Compatibility) {
+//      tree->Fill();
+//  }
   
   std::cout << "Final tree has " << tree->GetEntries() << " entries." << std::endl;
   
