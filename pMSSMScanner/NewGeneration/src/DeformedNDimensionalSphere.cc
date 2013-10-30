@@ -11,7 +11,7 @@
 #include "DeformedNDimensionalSphere.h"
 
 
-float maxRadius=0.4;
+float maxRadius=0.6;
 
 float GetNewPoint(float initial, int iPar, float weight,TRandom3 *randgen) {
   float lowrange,highrange;
@@ -20,7 +20,7 @@ float GetNewPoint(float initial, int iPar, float weight,TRandom3 *randgen) {
   bool IsNewPointOk=false;
   while(!IsNewPointOk) {
       if(initial<lowrange||initial>highrange) {
-          std::cerr << " The initial point (" << initial << ") for parameter " << iPar << " is outside the allowed range [" << lowrange << "," << highrange << "] . Will reset initial point to lower boundary of range (" << lowrange << ")";
+          std::cerr << " The initial point (" << initial << ") for parameter " << iPar << " is outside the allowed range [" << lowrange << "," << highrange << "] . Will reset initial point to lower boundary of range (" << lowrange << ")" << std::endl;
           initial=lowrange;
       }
     float addon=randgen->Uniform(lowrange,highrange);
