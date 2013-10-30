@@ -4,7 +4,7 @@
 #include <fstream>
 #include <assert.h>
 
-#include "../StorageLibrary.C"
+#include "include/StorageLibrary.h"
 
 bool IsKilled=false;
 
@@ -56,33 +56,33 @@ void Assign(std::string line, float value) {
   if((int)line.find("BR(b->s gamma)")>=0) {
     float bsgamma=value;
     if(!(bsgamma > (x0_bsg-2*dx_bsg) &&  bsgamma < (x0_bsg+2*dx_bsg))) {
-      std::cout << "xxxxxxxx Point contradicts BR(b->s gamma) constraint!" << std::endl;
+      std::cout << "xxxxxxxx Point contradicts BR(b->s gamma) constraint!     range: "<< (x0_bsg-2*dx_bsg) << " , " << (x0_bsg+2*dx_bsg) << std::endl;
       IsKilled=true;
-      Satisfies_bsgamma=false;
+      Satisfies_bsgamma=0;
     } else {
-      std::cout << "         BR(b->s gamma) constraint satisfied" << std::endl;
+      std::cout << "         BR(b->s gamma) constraint satisfied     range: "<< (x0_bsg-2*dx_bsg) << " , " << (x0_bsg+2*dx_bsg) << std::endl;
       Satisfies_bsgamma=1;
     }
   }
   if((int)line.find("a_muon")>=0) {
     float muon_gm2=value;
     if(!((muon_gm2 > x0_amu-2*dx_amu && muon_gm2 < x0_amu+2*dx_amu))) {
-      std::cout << "xxxxxxxx Point contradicts anomalous magnetic moment of muon " << std::endl;
+      std::cout << "xxxxxxxx Point contradicts anomalous magnetic moment of muon!     range: " << x0_amu-2*dx_amu << " , " << x0_amu+2*dx_amu << std::endl;
       IsKilled=true;
       Satisfies_gm2=false;
     } else {
-      std::cout << "         constraint from anomalous magnetic moment of muon satisfied" << std::endl;
+      std::cout << "         constraint from anomalous magnetic moment of muon satisfied     range: " << x0_amu-2*dx_amu << " , " << x0_amu+2*dx_amu << std::endl;
       Satisfies_gm2=1;
     }
   }
   if((int)line.find("BR(Bs->mu mu)")>=0) {
     float Bsmumu=value;
     if(!(Bsmumu > x0_Bsmumu-2*dxm_Bsmumu && Bsmumu < x0_Bsmumu+2*dxp_Bsmumu)) {
-      std::cout << "xxxxxxxx Point contradicts constraint from BR(Bs->mu mu)" << std::endl;
+      std::cout << "xxxxxxxx Point contradicts constraint from BR(Bs->mu mu)          range: " << x0_Bsmumu-2*dxm_Bsmumu << " , " << x0_Bsmumu+2*dxp_Bsmumu << std::endl;
       IsKilled=true;
-      Satisfies_Bsmumu=false;
+      Satisfies_Bsmumu=0;
     } else {
-      std::cout << "         BR(Bs->mu mu) constraint satisfied" << std::endl;
+      std::cout << "         BR(Bs->mu mu) constraint satisfied          range: " << x0_Bsmumu-2*dxm_Bsmumu << " , " << x0_Bsmumu+2*dxp_Bsmumu << std::endl;
       Satisfies_Bsmumu=1;
     }
   }
@@ -90,7 +90,7 @@ void Assign(std::string line, float value) {
     if(value==1) {
       std::cout << "xxxxxxxx Higgs mass has already been excluded ... " << std::endl;
       IsKilled=true;
-      Satisfies_Higgs=false;
+      Satisfies_Higgs=0;
     } else {
       std::cout << "         Higgs constraint satisfied" << std::endl;
       Satisfies_Higgs=1;
@@ -100,7 +100,7 @@ void Assign(std::string line, float value) {
     if(value==1) {
       std::cout << "xxxxxxxx SUSY masses already excluded ... " << std::endl;
       IsKilled=true;
-      Satisfies_SUSY=false;
+      Satisfies_SUSY=0;
     } else {
       std::cout << "         SUSY  mass constraints satisfied" << std::endl;
       Satisfies_SUSY=1;
@@ -109,7 +109,7 @@ void Assign(std::string line, float value) {
   if((int)line.find("charged_LSP")>=0) {
     if(value==1) {
       std::cout << "xxxxxxxx LSP is charged ... " << std::endl;
-      Satisfies_LSP=false;
+      Satisfies_LSP=0;
       IsKilled=true;
     } else {
       std::cout << "         LSP not charged" << std::endl;
@@ -135,7 +135,7 @@ void ProcessResLine(std::string line) {
     if(!(mt > x0_mt-2*dx_mt && mt < x0_mt+2*dx_mt)) {
       std::cout << "xxxxxxxx top mass is off : " << mt << std::endl;
       IsKilled=true;
-      Satisfies_Top=false;
+      Satisfies_Top=0;
     } else { 
       std::cout << "         top mass ok (" << mt << ")" << std::endl;
       Satisfies_Top=1;
@@ -147,7 +147,7 @@ void ProcessResLine(std::string line) {
     if(!((mbmb > x0_mbmb-2*dxm_mbmb && mbmb < x0_mbmb+2*dxp_mbmb))) {
       std::cout << "xxxxxxxx mbmb is off : " << mbmb << std::endl;
       IsKilled=true;
-      Satisfies_Mbmb=false;
+      Satisfies_Mbmb=0;
     } else { 
       std::cout << "         mbmb ok (" << mbmb << ")" << std::endl;
       Satisfies_Mbmb=1;
@@ -159,9 +159,9 @@ void ProcessResLine(std::string line) {
     if(!(alphas > x0_alphas-2*dx_alphas && alphas < x0_alphas+2*dx_alphas)) {
       std::cout << "xxxxxxxx alphas is off : " << alphas << std::endl;
       IsKilled=true;
-      Satisfies_Alphas=false;
+      Satisfies_Alphas=0;
     } else { 
-      std::cout << "         alphas mass ok (" << alphas << ")" << std::endl;
+      std::cout << "         alphas ok (" << alphas << ")" << std::endl;
       Satisfies_Alphas=1;
     }
   }
@@ -199,47 +199,47 @@ void ProcessResLine(std::string line) {
   if(size>59) {
     bsgamma = atof(Infos[59].c_str());
     if(!((bsgamma > (x0_bsg-2*dx_bsg) && bsgamma < (x0_bsg+2*dx_bsg)))) {
-      std::cout << "xxxxxxxx bsgamma is off : " << bsgamma << std::endl;
+      std::cout << "xxxxxxxx bsgamma is off : " << bsgamma << "      (range : " << (x0_bsg-2*dx_bsg)  << " , " <<  (x0_bsg+2*dx_bsg) << " )" << std::endl;
       IsKilled=true;
-      Satisfies_bsgamma=false;
+      Satisfies_bsgamma=0;
     } else { 
-      std::cout << "         bsgamma ok (" << bsgamma << ")" << std::endl;
+      std::cout << "         bsgamma ok (" << bsgamma << "      (range : " << (x0_bsg-2*dx_bsg)  << " , " <<  (x0_bsg+2*dx_bsg) << " )" << std::endl;
       Satisfies_bsgamma=1;
     }
   }
   
   if(size>61) {
     RBtaunu = atof(Infos[61].c_str());
-    if(!(RBtaunu > x0_RBtaunu-2*dx_RBtaunu and RBtaunu < x0_RBtaunu+2*dx_RBtaunu)) {
-      std::cout << "xxxxxxxx RBtaunu is off : " << RBtaunu << std::endl;
+    if(!(RBtaunu > x0_RBtaunu-2*dx_RBtaunu && RBtaunu < x0_RBtaunu+2*dx_RBtaunu)) {
+      std::cout << "xxxxxxxx RBtaunu is off : "  << RBtaunu << "      (range : " << (x0_RBtaunu-2*dx_RBtaunu)  << " , " <<  (x0_RBtaunu+2*dx_RBtaunu) << " )" << std::endl;
       IsKilled=true;
-      Satisfies_RBtaunu=false;
+      Satisfies_RBtaunu=0;
     } else { 
-      std::cout << "         RBtaunu ok (" << RBtaunu << ")" << std::endl;
+      std::cout << "         RBtaunu ok (" << RBtaunu << ")" << "      (range : " << (x0_RBtaunu-2*dx_RBtaunu)  << " , " <<  (x0_RBtaunu+2*dx_RBtaunu) << " )" << std::endl;
       Satisfies_RBtaunu=1;
     }
   }
   
   if(size>66) {
     Bsmumu = atof(Infos[66].c_str());
-    if(!((Bsmumu > x0_Bsmumu-2*dxm_Bsmumu and Bsmumu < x0_Bsmumu+2*dxp_Bsmumu))) {
-      std::cout << "xxxxxxxx BsMuMu is off : " << Bsmumu << std::endl;
+    if(!((Bsmumu > x0_Bsmumu-2*dxm_Bsmumu &&  Bsmumu < x0_Bsmumu+2*dxp_Bsmumu))) {
+      std::cout << "xxxxxxxx BsMuMu is off : " << Bsmumu << "      (range : " << (x0_Bsmumu-2*dxm_Bsmumu)  << " , " <<  (x0_Bsmumu+2*dxp_Bsmumu) << " )" << std::endl;
       IsKilled=true;
-      Satisfies_Bsmumu=false;
+      Satisfies_Bsmumu=0;
     } else { 
-      std::cout << "         BsMuMu is ok (" << Bsmumu << ")" << std::endl;
+      std::cout << "         BsMuMu is ok (" << Bsmumu << ")" << "      (range : " << (x0_Bsmumu-2*dxm_Bsmumu)  << " , " <<  (x0_Bsmumu+2*dxp_Bsmumu) << " )" << std::endl;
       Satisfies_Bsmumu=1;
     }
   }
 
   if(size>70) {
     muon_gm2 = atof(Infos[70].c_str());
-    if(!(muon_gm2 > x0_amu-2*dx_amu and muon_gm2 < x0_amu+2*dx_amu)) {
-      std::cout << "xxxxxxxx g2 is off : " << muon_gm2 << std::endl;
+    if(!(muon_gm2 > x0_amu-2*dx_amu &&  muon_gm2 < x0_amu+2*dx_amu)) {
+      std::cout << "xxxxxxxx g2 is off : " << muon_gm2 << "      (range : " << (x0_amu-2*dx_amu)  << " , " <<  (x0_amu+2*dx_amu) << " )" << std::endl;
       IsKilled=true;
       Satisfies_gm2=false;
     } else { 
-      std::cout << "         g2 ok (" << muon_gm2 << ")" << std::endl;
+      std::cout << "         g2 ok (" << muon_gm2 << ")" << "      (range : " << (x0_amu-2*dx_amu)  << " , " <<  (x0_amu+2*dx_amu) << " )" << std::endl;
       Satisfies_gm2=1;
     }
   }
@@ -312,7 +312,7 @@ int main() {
   ConstraintLog.close();
   
   if(IsKilled) {
-    cout << "Got killed. Storing. " << endl;
+    std::cout << "Got killed. Storing. " << std::endl;
     StoreThisPoint();
   }
   
