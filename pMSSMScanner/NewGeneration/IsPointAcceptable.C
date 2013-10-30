@@ -56,33 +56,33 @@ void Assign(std::string line, float value) {
   if((int)line.find("BR(b->s gamma)")>=0) {
     float bsgamma=value;
     if(!(bsgamma > (x0_bsg-2*dx_bsg) &&  bsgamma < (x0_bsg+2*dx_bsg))) {
-      std::cout << "xxxxxxxx Point contradicts BR(b->s gamma) constraint!     range: "<< (x0_bsg-2*dx_bsg) << " , " << (x0_bsg+2*dx_bsg) << std::endl;
+      std::cout << "xxxxxxxx Point contradicts BR(b->s gamma) constraint!     (value: " << bsgamma << ") range: "<< (x0_bsg-2*dx_bsg) << " , " << (x0_bsg+2*dx_bsg) << std::endl;
       IsKilled=true;
       Satisfies_bsgamma=0;
     } else {
-      std::cout << "         BR(b->s gamma) constraint satisfied     range: "<< (x0_bsg-2*dx_bsg) << " , " << (x0_bsg+2*dx_bsg) << std::endl;
+      std::cout << "         BR(b->s gamma) constraint satisfied     (value: " << bsgamma << ") range: "<< (x0_bsg-2*dx_bsg) << " , " << (x0_bsg+2*dx_bsg) << std::endl;
       Satisfies_bsgamma=1;
     }
   }
   if((int)line.find("a_muon")>=0) {
     float muon_gm2=value;
     if(!((muon_gm2 > x0_amu-2*dx_amu && muon_gm2 < x0_amu+2*dx_amu))) {
-      std::cout << "xxxxxxxx Point contradicts anomalous magnetic moment of muon!     range: " << x0_amu-2*dx_amu << " , " << x0_amu+2*dx_amu << std::endl;
+      std::cout << "xxxxxxxx Point contradicts anomalous magnetic moment of muon!     (value: " << muon_gm2 << ") range: " << x0_amu-2*dx_amu << " , " << x0_amu+2*dx_amu << std::endl;
       IsKilled=true;
       Satisfies_gm2=false;
     } else {
-      std::cout << "         constraint from anomalous magnetic moment of muon satisfied     range: " << x0_amu-2*dx_amu << " , " << x0_amu+2*dx_amu << std::endl;
+      std::cout << "         constraint from anomalous magnetic moment of muon satisfied     (value: " << muon_gm2 << ") range: " << x0_amu-2*dx_amu << " , " << x0_amu+2*dx_amu << std::endl;
       Satisfies_gm2=1;
     }
   }
   if((int)line.find("BR(Bs->mu mu)")>=0) {
     float Bsmumu=value;
     if(!(Bsmumu > x0_Bsmumu-2*dxm_Bsmumu && Bsmumu < x0_Bsmumu+2*dxp_Bsmumu)) {
-      std::cout << "xxxxxxxx Point contradicts constraint from BR(Bs->mu mu)          range: " << x0_Bsmumu-2*dxm_Bsmumu << " , " << x0_Bsmumu+2*dxp_Bsmumu << std::endl;
+      std::cout << "xxxxxxxx Point contradicts constraint from BR(Bs->mu mu)          (value: " << Bsmumu << ") range: " << x0_Bsmumu-2*dxm_Bsmumu << " , " << x0_Bsmumu+2*dxp_Bsmumu << std::endl;
       IsKilled=true;
       Satisfies_Bsmumu=0;
     } else {
-      std::cout << "         BR(Bs->mu mu) constraint satisfied          range: " << x0_Bsmumu-2*dxm_Bsmumu << " , " << x0_Bsmumu+2*dxp_Bsmumu << std::endl;
+      std::cout << "         BR(Bs->mu mu) constraint satisfied          (value: " << Bsmumu << ") range: " << x0_Bsmumu-2*dxm_Bsmumu << " , " << x0_Bsmumu+2*dxp_Bsmumu << std::endl;
       Satisfies_Bsmumu=1;
     }
   }
@@ -116,6 +116,17 @@ void Assign(std::string line, float value) {
       Satisfies_LSP=1;
     }
   }
+  if((int)line.find("R(B->tau nu)")==0) {
+    float RBtaunu=value;
+    if(! ((x0_RBtaunu-2*dx_RBtaunu)<RBtaunu   && RBtaunu< (x0_RBtaunu+2*dx_RBtaunu)  ) ) {
+      std::cout << "xxxxxxxx R(B->tau nu) violated ... (" << RBtaunu << ")" << "      (range : " << (x0_RBtaunu-2*dx_RBtaunu)  << " , " <<  (x0_RBtaunu+2*dx_RBtaunu) << " )" << std::endl;
+      Satisfies_RBtaunu=0;
+      IsKilled=true;
+    } else {
+      std::cout << "         R(B->tau nu) ok (" << RBtaunu << ")" << "      (range : " << (x0_RBtaunu-2*dx_RBtaunu)  << " , " <<  (x0_RBtaunu+2*dx_RBtaunu) << " )" << std::endl;
+      Satisfies_RBtaunu=1;
+    }
+  }
 }
 
 void ProcessLine(std::string line) {
@@ -124,6 +135,7 @@ void ProcessLine(std::string line) {
 }
 
 void ProcessResLine(std::string line) {
+  std::cout << "___RESLINE____" << std::endl;
   std::vector<std::string> Infos=StringSplit(line," ");
   
   int size=Infos.size();
@@ -196,18 +208,18 @@ void ProcessResLine(std::string line) {
     }
   }*/
   
-  if(size>59) {
-    bsgamma = atof(Infos[59].c_str());
-    if(!((bsgamma > (x0_bsg-2*dx_bsg) && bsgamma < (x0_bsg+2*dx_bsg)))) {
-      std::cout << "xxxxxxxx bsgamma is off : " << bsgamma << "      (range : " << (x0_bsg-2*dx_bsg)  << " , " <<  (x0_bsg+2*dx_bsg) << " )" << std::endl;
-      IsKilled=true;
-      Satisfies_bsgamma=0;
-    } else { 
-      std::cout << "         bsgamma ok (" << bsgamma << "      (range : " << (x0_bsg-2*dx_bsg)  << " , " <<  (x0_bsg+2*dx_bsg) << " )" << std::endl;
-      Satisfies_bsgamma=1;
-    }
-  }
-  
+//  if(size>59) {
+//    bsgamma = atof(Infos[59].c_str());
+//    if(!((bsgamma > (x0_bsg-2*dx_bsg) && bsgamma < (x0_bsg+2*dx_bsg)))) {
+//      std::cout << "xxxxxxxx bsgamma is off : " << bsgamma << "      (value: " << bsgamma << ") (range : " << (x0_bsg-2*dx_bsg)  << " , " <<  (x0_bsg+2*dx_bsg) << " )" << std::endl;
+//      IsKilled=true;
+//      Satisfies_bsgamma=0;
+//    } else { 
+//      std::cout << "         bsgamma ok (" << bsgamma << "      (value: " << bsgamma << ") (range : " << (x0_bsg-2*dx_bsg)  << " , " <<  (x0_bsg+2*dx_bsg) << " )" << std::endl;
+//      Satisfies_bsgamma=1;
+//    }
+//  }
+  for(int i=0;i<61;i++) std::cout << i << " : " << Infos[i] << std::endl;
   if(size>61) {
     RBtaunu = atof(Infos[61].c_str());
     if(!(RBtaunu > x0_RBtaunu-2*dx_RBtaunu && RBtaunu < x0_RBtaunu+2*dx_RBtaunu)) {
@@ -293,13 +305,13 @@ int main() {
   
   information.close();
   
-  std::ifstream ResInformation;
+/*  std::ifstream ResInformation;
   ResInformation.open("res_t.tmp");
   while(std::getline(ResInformation,information_line)) {
     ProcessResLine(information_line);
   }
   
-  ResInformation.close();
+  ResInformation.close();*/
   
   std::ofstream answer;
   answer.open("IsAcceptable.txt");
