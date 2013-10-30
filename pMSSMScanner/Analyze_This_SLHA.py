@@ -477,11 +477,11 @@ def ComputeCompatibility(filename,slhaname):
   kaswrite.close()
   
   kspwrite = open("KS_Summary.txt",'w')
-  kspwrite.write(str(KSP_LM)+'\n')
-  kspwrite.write(str(KSP_HM)+'\n')
-  kspwrite.write(str(KSP_MET)+'\n')
-  kspwrite.write(str(KSP_BTag)+'\n')
-  kspwrite.write(str(float(Methisto.Integral()/NGenEvents))+'\n')
+  kspwrite.write(str(KSP_LM)+' ')
+  kspwrite.write(str(KSP_HM)+' ')
+  kspwrite.write(str(KSP_MET)+' ')
+  kspwrite.write(str(KSP_BTag)+' ')
+  kspwrite.write(str(float(Methisto.Integral()/NGenEvents))+' ')
   
   
 #  print "Compatibility in low mass: "+str(KSP_LowMass)
