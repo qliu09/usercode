@@ -388,7 +388,7 @@ int main() {
   
   randgen = new TRandom3(0);
   
-  while(!HaveValidSLHA&&nAttempts<10000) {
+  while(!HaveValidSLHA&&nAttempts<10000000) {
     std::cout << "\033[1;34m Attempt " << nAttempts << "\033[0m " << std::endl;
 
     HaveValidSLHA=false;
@@ -424,7 +424,7 @@ int main() {
   
   FinalSteps();
   
-  std::cout << "Getting a valid model took " << nAttempts << " attempts." << std::endl;
+  std::cout << "Getting a theoretically valid model with acceptable Higgs mass took " << nAttempts << " attempts." << std::endl;
   
   WriteQuickConfig(mh);
   
