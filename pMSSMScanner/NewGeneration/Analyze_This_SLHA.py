@@ -22,7 +22,7 @@ elapsed=0
 
 NGenEvents=1000000
 
-NRounds=100
+NRounds=1000
 
 DoIllustration=False ## if this is set to true you get nice plots for each signal point (but the script takes longer)
 
