@@ -72,7 +72,7 @@ std::cout << "Glo Pearl" << std::endl;
 }
 
 void FinalSteps() {
-  std::cerr << "Have not yet defined final steps ... " << std::endl;
+//  std::cerr << "Have not yet defined final steps ... " << std::endl;
 }
 
 void DefineRange(const int ipar, float &lowrange, float &highrange) {
