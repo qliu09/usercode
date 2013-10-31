@@ -42,6 +42,8 @@ void StoreBestPoint(float compatibility) {
 int main(int argc, char** argv) {
   if(argc<3) {
     std::cout << "you're supposed to give me the compatibility so i can store it (the second argument is the path to the summary file). try again. " << std::endl;
+    std::cout << "Only gotten " << argc << " arguments. Here's the list of arguments: " << std::endl;
+    for(int i=0;i<argc;i++) std::cout << "   arg " << i << " : " << argv[i] << std::endl;
     return -1;
   }
   
