@@ -21,7 +21,7 @@ TTree* tpmssm;
 
 int FullFills(string cut) {
     stringstream scut;
-    scut << "(" << cut << ">0&&SLHAValid && abs(HiggsMass-125.4)<2)";
+    scut << "(" << cut << ">0&&SLHAValid && abs(HiggsMass-125.4)<2.5)";
     int Result = tpmssm->Draw("HiggsMass",scut.str().c_str(),"goff");
     return Result;
     
@@ -107,8 +107,8 @@ int main() {
     cutflow->SetBinContent(2,ComputeCut("SLHAValid"));
     cutflow->GetXaxis()->SetBinLabel(2,"Theoretically sound");
     
-    cutflow->SetBinContent(3,ComputeCut("abs(HiggsMass-125.4)<2"));
-    cutflow->GetXaxis()->SetBinLabel(3,"E: m_{h}=125.4#pm 2 GeV");
+    cutflow->SetBinContent(3,ComputeCut("abs(HiggsMass-125.4)<2.5"));
+    cutflow->GetXaxis()->SetBinLabel(3,"E: m_{h}=125.4#pm 2.5 GeV");
     
     
 //    cutflow->SetBinContent(4,ComputeCut("Satisfies_Alphas"));
