@@ -6,10 +6,12 @@
 #include <TTree.h>
 
 int SLHAValid,Satisfies_bsgamma,Satisfies_gm2,Satisfies_Bsmumu,Satisfies_Higgs,Satisfies_SUSY,Satisfies_LSP,Satisfies_Top,Satisfies_Mbmb,Satisfies_Alphas;
-int Satisfies_BsGamma,Satisfies_RBtaunu,Satisfies_BsMuMu;
+int Satisfies_RBtaunu;
 float HiggsMass,Compatibility;
 bool Problematic=false;
 float pMSSMpars[20];
+
+float KSP_LM,KSP_HM,KSP_MET,KSP_BTAG,eff;
 
 unsigned int split(const std::string &txt, std::vector<std::string> &strs, char ch)
 {
@@ -38,15 +40,22 @@ float Cond(std::vector<std::string> v, int index){
 
 void InterpretLine(std::string line) {
     
-    
-    
     std::vector<std::string> v;
     
     split( line, v, ' ' );
     
+    Problematic=false;
+    
     for(int i=0;i<20;i++) {
-        if(v.size()>i) pMSSMpars[i]=atof(v[i].c_str());
-        else pMSSMpars[i]=-1;
+        if(v.size()>i) {
+	  pMSSMpars[i]=atof(v[i].c_str());
+	}
+	if(pMSSMpars[i]==-1 || !(v.size()>i)) {
+	  pMSSMpars[i]=-1;
+	  Problematic=true;
+	  std::cout << "Found a problematic line:" << std::endl;
+	  std::cout << "         " << line << std::endl;
+	}
     }
     
     SLHAValid=Cond(v,20);
@@ -60,10 +69,16 @@ void InterpretLine(std::string line) {
     Satisfies_Top=Cond(v,28);
     Satisfies_Mbmb=Cond(v,29);
     Satisfies_Alphas=Cond(v,30);
-    Satisfies_BsGamma=Cond(v,31);
-    Satisfies_RBtaunu=Cond(v,32);
-    Satisfies_BsMuMu=Cond(v,33);
+    Satisfies_RBtaunu=Cond(v,31);
     Compatibility=Cond(v,32);
+    KSP_LM=Cond(v,33);
+    KSP_HM=Cond(v,33);
+    KSP_MET=Cond(v,34);
+    KSP_BTAG=Cond(v,35);
+    eff=Cond(v,36);
+
+
+
 }
 
 int main() {
@@ -73,7 +88,7 @@ int main() {
 
   
   
-  TFile *fout = new TFile("fout.root","RECREATE");
+  TFile *fout = new TFile("pMSSMpoints.root","RECREATE");
   TTree *tree = new TTree("pmssm","pmssm");
   tree->Branch("mu",&pMSSMpars[8],"mu/F");
   tree->Branch("MG1",&pMSSMpars[2],"MG1/F");
@@ -105,21 +120,24 @@ int main() {
   tree->Branch("SLHAValid",&SLHAValid,"SLHAValid/I");
   tree->Branch("HiggsMass",&HiggsMass,"HiggsMass/F");
 
-  tree->Branch("Satisfies_bsgamma ",&Satisfies_bsgamma ,"Satisfies_bsgamma/I");
-  tree->Branch("Satisfies_gm2 ",&Satisfies_gm2 ,"Satisfies_gm2/I");
-  tree->Branch("Satisfies_Bsmumu ",&Satisfies_Bsmumu,"Satisfies_Bsmumu/I");
-  tree->Branch("Satisfies_Higgs ",&Satisfies_Higgs,"Satisfies_Higgs/I");
-  tree->Branch("Satisfies_SUSY ",&Satisfies_SUSY,"Satisfies_SUSY/I");
-  tree->Branch("Satisfies_LSP ",&Satisfies_LSP,"Satisfies_LSP/I");
+  tree->Branch("Satisfies_bsgamma",&Satisfies_bsgamma ,"Satisfies_bsgamma/I");
+  tree->Branch("Satisfies_gm2",&Satisfies_gm2 ,"Satisfies_gm2/I");
+  tree->Branch("Satisfies_Bsmumu",&Satisfies_Bsmumu,"Satisfies_Bsmumu/I");
+  tree->Branch("Satisfies_Higgs",&Satisfies_Higgs,"Satisfies_Higgs/I");
+  tree->Branch("Satisfies_SUSY",&Satisfies_SUSY,"Satisfies_SUSY/I");
+  tree->Branch("Satisfies_LSP",&Satisfies_LSP,"Satisfies_LSP/I");
   tree->Branch("Satisfies_Top",&Satisfies_Top,"Satisfies_Top/I");
     
   tree->Branch("Satisfies_Mbmb",&Satisfies_Mbmb,"Satisfies_Mbmb/I");
   tree->Branch("Satisfies_Alphas",&Satisfies_Alphas,"Satisfies_Alphas/I");
-  tree->Branch("Satisfies_BsGamma",&Satisfies_BsGamma,"Satisfies_BsGamma/I");
   tree->Branch("Satisfies_RBtaunu",&Satisfies_RBtaunu,"Satisfies_RBtaunu/I");
-  tree->Branch("Satisfies_BsMuMu",&Satisfies_BsMuMu,"Satisfies_BsMuMu/I");
   tree->Branch("Compatibility",&Compatibility,"Compatibility/F");
   
+  tree->Branch("KSP_LM",&KSP_LM,"KSP_LM/F");
+  tree->Branch("KSP_HM",&KSP_HM,"KSP_HM/F");
+  tree->Branch("KSP_MET",&KSP_MET,"KSP_MET/F");
+  tree->Branch("KSP_BTAG",&KSP_BTAG,"KSP_BTAG/F");
+  tree->Branch("eff",&eff,"eff/F");
 
   ifstream LogIn;
   LogIn.open("pointlog.txt");
@@ -133,18 +151,13 @@ int main() {
           getline (LogIn,line);
           InterpretLine(line);
           entries++;
-          if(entries%100==0) std::cout << "Working on entry " << entries << std::endl;
+//          if(entries%100==0) std::cout << "Working on entry " << entries << std::endl;
           if(Problematic) continue;
           tree->Fill();
       }
   }
   
   std::cout << " Whole file has " << entries << " entries" << std::endl;
-    
-  while(LogIn >> pMSSMpars[0] >> pMSSMpars[1] >> pMSSMpars[2] >> pMSSMpars[3] >> pMSSMpars[4] >> pMSSMpars[5] >> pMSSMpars[6] >> pMSSMpars[7] >> pMSSMpars[8] >> pMSSMpars[9] >> pMSSMpars[10] >> pMSSMpars[11] >> pMSSMpars[12] >> pMSSMpars[13] >> pMSSMpars[14] >> pMSSMpars[15] >> pMSSMpars[16] >> pMSSMpars[17] >> pMSSMpars[18] >> pMSSMpars[19] >> SLHAValid >> HiggsMass >> Satisfies_bsgamma >> Satisfies_gm2 >> Satisfies_Bsmumu >> Satisfies_Higgs >> Satisfies_SUSY >> Satisfies_LSP >> Satisfies_Top >> Satisfies_Mbmb >> Satisfies_Alphas >> Satisfies_BsGamma >> Satisfies_RBtaunu >> Satisfies_BsMuMu >> Compatibility) {
-      tree->Fill();
-  }
-  
   std::cout << "Final tree has " << tree->GetEntries() << " entries." << std::endl;
   
   tree->Write();  
