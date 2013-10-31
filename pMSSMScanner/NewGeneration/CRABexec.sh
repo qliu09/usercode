@@ -193,7 +193,7 @@ rm -f KS.txt
 cp ${REFDIR}/SuggestAPoint.exec .
 cp /shome/buchmann/Year_Of_SUSY_Discovery/NewSimulation/CMSSW_5_2_6/src/UserCode/Scans/LHECruncher/superiso_v3.3/slha.x .
 cp ${REFDIR}/IsPointAcceptable.exec .
-cp /shome/buchmann/Year_Of_SUSY_Discovery/NewSimulation/CMSSW_5_2_6/src/usercode/pMSSMScanner/NewReferenceDiffs.root .
+cp /shome/buchmann/Year_Of_SUSY_Discovery/NewSimulation/CMSSW_5_2_6/src/usercode/pMSSMScanner/DifferentialDistributions.root .
 cp /shome/buchmann/Year_Of_SUSY_Discovery/NewSimulation/CMSSW_5_2_6/src/usercode/pMSSMScanner/NewGeneration/RecentPointStorage.txt .
 
 #  _____ _               ___  
@@ -272,7 +272,7 @@ cp pointlog.txt Candidates/pointlog.txt
 mv pMSSMpoints.root Candidates/Overview.root
 
 mv ConstraintLog.txt Candidates/
-mv HiggsPoints.root Candidates/
+#mv HiggsPoints.root Candidates/
 tar cvf $SEOUTFILES Candidates/
 echo "Candidates have been packed. ready to leave."
 
