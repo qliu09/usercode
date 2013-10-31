@@ -344,7 +344,7 @@ bool HasAcceptableHiggsMass(float &hmass) {
     }
   }
   
-  bool Accepted=(abs(hmass-125.8)<2.5);
+  bool Accepted=(abs(hmass-125.4)<2.5);
   std::cout << "Identified a Higgs mass of " << hmass << "; accepted=" << Accepted << std::endl;
   EarlySLHA.close();
   
