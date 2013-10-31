@@ -45,7 +45,8 @@ int main(int argc, char** argv) {
     return -1;
   }
   
-    std::ifstream KS;
+  std::cout << "Storing point now ... " << std::endl;
+  std::ifstream KS;
     KS.open(argv[2]);
     float KSP_LM,KSP_HM,KSP_MET,KSP_BTag,eff;
     while(KS >> KSP_LM >> KSP_HM >> KSP_MET >> KSP_BTag >> eff) {
