@@ -69,7 +69,10 @@ def GenerateConfigFile(slhapath):
   f.write("\n                                                                                             'MSTP(162) = 68',")
   f.write("\n                                                                                             'MSTP(163) = 69'),")
   f.write('\n')
-  f.write("\n                                                             SLHAParameters = cms.vstring('SLHAFILE = "+slhapath[slhapath.find("usercode"):]+"'),") # starting at UserCode/
+  if slhapath.find("usercode") > 0 : 
+      f.write("\n                                                             SLHAParameters = cms.vstring('SLHAFILE = "+slhapath[slhapath.find("usercode"):]+"'),") # starting at UserCode/
+  if slhapath.find("UserCode") > 0 : 
+      f.write("\n                                                             SLHAParameters = cms.vstring('SLHAFILE = "+slhapath[slhapath.find("UserCode"):]+"'),") # starting at UserCode/
   f.write("\n                                                             parameterSets = cms.vstring('pythiaUESettings',")
   f.write("\n                                                                                         'processParameters','SLHAParameters')")
   f.write('\n')
