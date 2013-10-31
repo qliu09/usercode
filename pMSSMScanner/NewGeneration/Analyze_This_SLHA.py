@@ -5,6 +5,7 @@ import sys
 import ROOT
 import math
 import random
+import time
 px=0
 py=0
 met=0
@@ -13,6 +14,11 @@ nj=0
 ht=0
 NBtags=0
 leptons=[]
+
+start=0
+done=0
+elapsed=0
+
 
 NGenEvents=1000000
 
@@ -375,7 +381,7 @@ def Illustrate(ThisHisto,RefHisto,filename,KSP) :
     ThisHisto.Draw("e1")
     RefHisto.Draw("histo,same")
     ThisHisto.Draw("e1,same")
-    wksp2 = ROOT.TLatex(0.61,0.65,"#splitline{#splitline{KSP: "+str(float(int(10000*KSP))/10000)+"}{ }}{Stats: "+str(int(ThisHisto.GetEntries()))+"/"+str(NGenEvents)+"}")
+    wksp2 = ROOT.TLatex(0.61,0.65,"#splitline{#splitline{KSP: "+str(float(int(10000*KSP))/10000)+"}{ }}{Stats: "+str(int(ThisHisto.GetEntries()))+"/"+str((float(iRun)/float(NRounds))*NGenEvents)+"}")
     wksp2.SetNDC()
     wksp2.SetTextSize(0.03)
     wksp2.Draw()
@@ -409,8 +415,8 @@ def FlipOnOverFlowBin():
 
 
 
-def ComputeCompatibility(filename,slhaname):
-  global Methisto,Mllhisto,DoIllustration,HistoBTagMultiplicity,HistoJetMultiplicity,JetPthisto
+def ComputeCompatibility(filename,slhaname,iRun):
+  global Methisto,Mllhisto,DoIllustration,HistoBTagMultiplicity,HistoJetMultiplicity,JetPthisto,NRounds,NGenEvents
   
   RefFile = ROOT.TFile("DifferentialDistributions.root")
  
@@ -484,7 +490,7 @@ def ComputeCompatibility(filename,slhaname):
   kspwrite.write(str(KSP_HM)+' ')
   kspwrite.write(str(KSP_MET)+' ')
   kspwrite.write(str(KSP_BTag)+' ')
-  kspwrite.write(str(float(Methisto.Integral()/NGenEvents))+' ')
+  kspwrite.write(str(float(Methisto.Integral()/    ((float(iRun)/float(NRounds))*NGenEvents))   )+' ')
   
   
 #  print "Compatibility in low mass: "+str(KSP_LowMass)
@@ -533,7 +539,7 @@ def ComputeCompatibility(filename,slhaname):
   return KSP_Final
   
 
-def ProcessFile(filename,slhaname) :
+def ProcessFile(filename,slhaname,iRun) :
   
   FillHistogram(filename)
   
@@ -541,7 +547,7 @@ def ProcessFile(filename,slhaname) :
   #StoreHistogram(filename)
   
   global compat
-  compat = ComputeCompatibility(filename,slhaname)
+  compat = ComputeCompatibility(filename,slhaname,iRun)
   
   global cutoff
   if(compat<cutoff):
@@ -557,17 +563,24 @@ def ProcessFile(filename,slhaname) :
     return 1
 
 
-def CrunchNumbersForLHEFile(filename,slhaname):
+def CrunchNumbersForLHEFile(filename,slhaname,iRun):
   global compat
-  return [ProcessFile(filename,slhaname),compat]
+  return [ProcessFile(filename,slhaname,iRun),compat]
   
 def AnalyzeThisSLHA(slhapath):
   retval=0.0
-  for i in range(0,NRounds):
-    print "Now doing round "+str(i+1)+" of generating an LHE file (doing it in "+str(NRounds)+" rounds to reduce sandbox usage)"
-    LHEFile = GenerateLHEFile(slhapath)
-    retval=CrunchNumbersForLHEFile(LHEFile,slhapath)[0]
-    commands.getoutput("rm "+LHEFile)
+  for iRun in range(1,NRounds+1):
+    rightnow=time.time()
+    elapsed = rightnow-start
+    if elapsed>30*60: # more than half an hour has passed
+       print "This SLHA is taking too long to process - will stick with the statistics we currently have and be happy with that"
+       break
+    else: 
+      print "So far only "+str(elapsed)+" seconds have passed; this means it's ok to add another LHE round (which we wanted anyway)"
+      print "Now doing round "+str(iRun)+" of generating an LHE file (doing it in "+str(NRounds)+" rounds to reduce sandbox usage)"
+      LHEFile = GenerateLHEFile(slhapath)
+      retval=CrunchNumbersForLHEFile(LHEFile,slhapath,iRun)[0]
+      commands.getoutput("rm "+LHEFile)
   
   return retval
 
@@ -576,6 +589,7 @@ if len(sys.argv)<2:
   sys.exit(-1)
 
 SLHA_PATH=sys.argv[1]
+start = time.time()
 
 result = AnalyzeThisSLHA(SLHA_PATH)
 
