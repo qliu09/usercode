@@ -276,8 +276,8 @@ tar cvf $SEOUTFILES Candidates/
 echo "Candidates have been packed. ready to leave."
 
 TARname="`date +%H_%M_%S_%N`__${RANDOM}.tar"
-mkdir -p /shome/buchmann/Candidates/${SERESULTDIR}/
-cp $SEOUTFILES /shome/buchmann/Candidates/${SERESULTDIR}/${TARname}
+mkdir -p /shome/buchmann/Candidates/${JOBDIR}/
+cp $SEOUTFILES /shome/buchmann/Candidates/${JOBDIR}/${TARname}
 
 #### RETRIEVAL OF OUTPUT FILES AND CLEANING UP ############################
 cd $WORKDIR
