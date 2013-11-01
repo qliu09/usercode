@@ -41,9 +41,9 @@ USER_SRM_HOME="srm://t3se01.psi.ch:8443/srm/managerv2?SFN=/pnfs/psi.ch/cms/trivc
 TOPWORKDIR=/scratch/`whoami`
 
 # Basename of job sandbox (job workdir will be $TOPWORKDIR/$JOBDIR)
-JOBDIR=pMSSM_Interpretation_$1
+JOBDIR=pMSSM_Interpretation_Ready_$1
 
-SEUSERSUBDIR=pMSSM_Interpretation_GlobalScan
+SEUSERSUBDIR=pMSSM_Interpretation_GlobalScan_Ready
 
 ##################################################################
 
@@ -164,8 +164,6 @@ function check_time {
 
 
 
-MISSIONNAME="TESTING_pMSSM_vX"
-
 REFDIR="/shome/buchmann/Year_Of_SUSY_Discovery/NewSimulation/CMSSW_5_2_6/src/usercode/pMSSMScanner/NewGeneration/"
 
 
@@ -278,7 +276,8 @@ tar cvf $SEOUTFILES Candidates/
 echo "Candidates have been packed. ready to leave."
 
 TARname="`date +%H_%M_%S_%N`__${RANDOM}.tar"
-cp $SEOUTFILES /shome/buchmann/Candidates/FullOnCandidates_GlobalScan/${TARname}
+mkdir -p /shome/buchmann/Candidates/${SERESULTDIR}/
+cp $SEOUTFILES /shome/buchmann/Candidates/${SERESULTDIR}/${TARname}
 
 #### RETRIEVAL OF OUTPUT FILES AND CLEANING UP ############################
 cd $WORKDIR
