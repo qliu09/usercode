@@ -247,7 +247,8 @@ for model in {1..10000}; do
     ls -ltrh /shome/buchmann/Year_Of_SUSY_Discovery/NewSimulation/CMSSW_5_2_6/src/UserCode/Scans/LHECruncher/$SLHAname
     python ${REFDIR}/Analyze_This_SLHA.py /shome/buchmann/Year_Of_SUSY_Discovery/NewSimulation/CMSSW_5_2_6/src/UserCode/Scans/LHECruncher/$SLHAname
     Marker=`cat Marker.txt`
-    ${REFDIR}/StoreThisPoint.exec $Marker `pwd`/KS_Summary.txt
+    echo "Have gotten Marker with information $Marker"
+    ${REFDIR}/StoreThisPoint.exec `pwd`/KS_Summary.txt
     NOW=`date +%Y%m%d_%H%M%S`
     mv /shome/buchmann/Year_Of_SUSY_Discovery/NewSimulation/CMSSW_5_2_6/src/UserCode/Scans/LHECruncher/$SLHAname $WORKDIR/Candidates/${Marker}_${1}_${NOW}
   fi
@@ -299,11 +300,11 @@ if test -e $SEOUTFILES; then
        if test ! -e $WORKDIR/$n; then
           echo "WARNING: Cannot find output file $WORKDIR/$n. Ignoring it" >&2
        else
-          lcg-cp -b -D srmv2 $srmdebug /$WORKDIR/$n $SERESULTDIR/$n
+          lcg-cp -b -D srmv2 $srmdebug file:////$WORKDIR/$n $SERESULTDIR/$n
           if test $? -ne 0; then
              echo "ERROR: Failed to copy $WORKDIR/$n to $SERESULTDIR/Tars/$n" >&2
           fi
-          lcg-cp -b -D srmv2 $srmdebug /$WORKDIR/Candidates/pMSSMpoints.root $SERESULTDIR/Overview/pMSSMpoints_${1}.root
+          lcg-cp -b -D srmv2 $srmdebug file:////$WORKDIR/Candidates/Overview.root $SERESULTDIR/Overview/pMSSMpoints_${1}.root
           if test $? -ne 0; then
              echo "ERROR: Failed to copy $WORKDIR/$n to $SERESULTDIR/$n" >&2
           fi
