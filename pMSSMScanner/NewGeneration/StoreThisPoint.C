@@ -40,22 +40,20 @@ void StoreBestPoint(float compatibility) {
 
 
 int main(int argc, char** argv) {
-  if(argc<3) {
-    std::cout << "you're supposed to give me the compatibility so i can store it (the second argument is the path to the summary file). try again. " << std::endl;
-    std::cout << "Only gotten " << argc << " arguments. Here's the list of arguments: " << std::endl;
-    for(int i=0;i<argc;i++) std::cout << "   arg " << i << " : " << argv[i] << std::endl;
+  if(argc<2) {
+    std::cout << "you're supposed to give me the path to the summary file. try again. " << std::endl;
     return -1;
   }
   
   std::cout << "Storing point now ... " << std::endl;
   std::ifstream KS;
-    KS.open(argv[2]);
-    float KSP_LM,KSP_HM,KSP_MET,KSP_BTag,eff;
-    while(KS >> KSP_LM >> KSP_HM >> KSP_MET >> KSP_BTag >> eff) {
+    KS.open(argv[1]);
+    float compatibility,KSP_LM,KSP_HM,KSP_MET,KSP_BTag,eff;
+    while(KS >> compatibility >> KSP_LM >> KSP_HM >> KSP_MET >> KSP_BTag >> eff) {
         std::cout << "Loaded values " << KSP_LM << " : " << KSP_HM << " : " << KSP_MET << " : " << KSP_BTag << " : " << eff << std::endl;
     }
 
     
-  StoreThisPoint(atof(argv[1]),KSP_LM,KSP_HM,KSP_MET,KSP_BTag,eff);
-  StoreBestPoint(atof(argv[1]));
+  StoreThisPoint(compatibility,KSP_LM,KSP_HM,KSP_MET,KSP_BTag,eff);
+  StoreBestPoint(compatibility);
 }

@@ -486,6 +486,7 @@ def ComputeCompatibility(filename,slhaname,iRun):
   kaswrite.close()
   
   kspwrite = open("KS_Summary.txt",'w')
+  kspwrite.write(str(KSP_Final)+' ')
   kspwrite.write(str(KSP_LM)+' ')
   kspwrite.write(str(KSP_HM)+' ')
   kspwrite.write(str(KSP_MET)+' ')
