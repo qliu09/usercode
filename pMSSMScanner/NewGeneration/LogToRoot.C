@@ -11,7 +11,7 @@ float HiggsMass,Compatibility;
 bool Problematic=false;
 float pMSSMpars[20];
 
-float KSP_LM,KSP_HM,KSP_MET,KSP_BTAG,eff;
+float KSP_LM,KSP_HM,KSP_MET,KSP_BTAG,eff,LM_Integral,FullStats;
 
 unsigned int split(const std::string &txt, std::vector<std::string> &strs, char ch)
 {
@@ -72,13 +72,12 @@ void InterpretLine(std::string line) {
     Satisfies_RBtaunu=Cond(v,31);
     Compatibility=Cond(v,32);
     KSP_LM=Cond(v,33);
-    KSP_HM=Cond(v,33);
-    KSP_MET=Cond(v,34);
-    KSP_BTAG=Cond(v,35);
-    eff=Cond(v,36);
-
-
-
+    KSP_HM=Cond(v,34);
+    KSP_MET=Cond(v,35);
+    KSP_BTAG=Cond(v,36);
+    eff=Cond(v,37);
+    LM_Integral=Cond(v,38);
+    FullStats=Cond(v,39);
 }
 
 int main() {
@@ -138,6 +137,8 @@ int main() {
   tree->Branch("KSP_MET",&KSP_MET,"KSP_MET/F");
   tree->Branch("KSP_BTAG",&KSP_BTAG,"KSP_BTAG/F");
   tree->Branch("eff",&eff,"eff/F");
+  tree->Branch("FullStats",&FullStats,"FullStats/F");
+  tree->Branch("LM_Integral",&LM_Integral,"LM_Integral/F");
 
   ifstream LogIn;
   LogIn.open("pointlog.txt");
@@ -166,6 +167,3 @@ int main() {
 
 return 0;
 }
-  
-
-  
