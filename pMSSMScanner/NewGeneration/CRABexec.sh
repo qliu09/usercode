@@ -41,9 +41,9 @@ USER_SRM_HOME="srm://t3se01.psi.ch:8443/srm/managerv2?SFN=/pnfs/psi.ch/cms/trivc
 TOPWORKDIR=/scratch/`whoami`
 
 # Basename of job sandbox (job workdir will be $TOPWORKDIR/$JOBDIR)
-JOBDIR=pMSSM_Interpretation_Ready_$1
+JOBDIR=pMSSM_Interpretation_FullGlobalScan_$1
 
-SEUSERSUBDIR=pMSSM_Interpretation_GlobalScan_Ready
+SEUSERSUBDIR=pMSSM_Interpretation_FullGlobalScan
 
 ##################################################################
 
@@ -243,6 +243,7 @@ for model in {1..10000}; do
     mv ${WORKDIR}/susyhit_slha.out /shome/buchmann/Year_Of_SUSY_Discovery/NewSimulation/CMSSW_5_2_6/src/UserCode/Scans/LHECruncher/$SLHAname
     echo "The output (susyhit_slha_out) is now called $SLHAname and is at /shome/buchmann/Year_Of_SUSY_Discovery/NewSimulation/CMSSW_5_2_6/src/UserCode/Scans/LHECruncher/$SLHAname : "
     ls -ltrh /shome/buchmann/Year_Of_SUSY_Discovery/NewSimulation/CMSSW_5_2_6/src/UserCode/Scans/LHECruncher/$SLHAname
+    cat ${REFDIR}/BouncerText.txt
     python ${REFDIR}/Analyze_This_SLHA.py /shome/buchmann/Year_Of_SUSY_Discovery/NewSimulation/CMSSW_5_2_6/src/UserCode/Scans/LHECruncher/$SLHAname
     Marker=`cat Marker.txt`
     echo "Have gotten Marker with information $Marker"
