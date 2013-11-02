@@ -423,10 +423,10 @@ def ComputeCompatibility(filename,slhaname,iRun):
   FlipOnOverFlowBin() 
  
   print "The histograms contain the following number of events   (btag/jet/mll/met):"
-  print HistoBTagMultiplicity.Integral()
-  print HistoJetMultiplicity.Integral()
-  print Mllhisto.Integral()
-  print Methisto.Integral()
+  print "BTag integral "+str(HistoBTagMultiplicity.Integral())
+  print "Jet histo integral "+str(HistoJetMultiplicity.Integral())
+  print "Mll histo integral "+str(Mllhisto.Integral())
+  print "MET histo integral "+str(Methisto.Integral())
   
 #  RefHistoBTagMultiplicity = RefFile.Get("dBTag")
 #  KSP_BTag = RefHistoBTagMultiplicity.KolmogorovTest(HistoBTagMultiplicity)
@@ -463,6 +463,10 @@ def ComputeCompatibility(filename,slhaname,iRun):
 #  for nbt in range(1,HistoBTagMultiplicity.GetNbinsX()+1):
 #    print str(nbt)+" : "+str(HistoBTagMultiplicity.GetBinCenter(nbt))+" has "+str(HistoBTagMultiplicity.GetBinContent(nbt))+" entries"
 
+  efficiency=float(Methisto.Integral()/    ((float(iRun)/float(NRounds))*NGenEvents))   
+  print "Selected integral "+str(Methisto.Integral())+" and given that this is round "+str(iRun)+", i.e. there's "+str(((float(iRun)/float(NRounds))*NGenEvents))+" so the efficiency is "+str(efficiency)
+
+
   print "Compatibilities: "
   #  print "Mll: "+str(KSP_Mass)
   print "low mass: "+str(KSP_LM)
@@ -471,7 +475,8 @@ def ComputeCompatibility(filename,slhaname,iRun):
 #  print "BTag: "+str(KSP_BTag)
 #  print "JET: "+str(KSP_Jet)
   print "MET: "+str(KSP_MET)
-        
+  print "efficiency: "+str(efficiency)
+  
   KSP_Final = KSP_LM + KSP_HM + KSP_MET + KSP_BTag
   
   PResult=str(("{0:.10f}".format(KSP_Final)))
@@ -485,13 +490,17 @@ def ComputeCompatibility(filename,slhaname,iRun):
   kaswrite.write(str(KSP_Final))
   kaswrite.close()
   
+  FullStats=((float(iRun)/float(NRounds))*NGenEvents)
+  
   kspwrite = open("KS_Summary.txt",'w')
   kspwrite.write(str(KSP_Final)+' ')
   kspwrite.write(str(KSP_LM)+' ')
   kspwrite.write(str(KSP_HM)+' ')
   kspwrite.write(str(KSP_MET)+' ')
   kspwrite.write(str(KSP_BTag)+' ')
-  kspwrite.write(str(float(Methisto.Integral()/    ((float(iRun)/float(NRounds))*NGenEvents))   )+' ')
+  kspwrite.write(str(efficiency)+' ')
+  kspwrite.write(str(Methisto.Integral())+' ')
+  kspwrite.write(str(FullStats)+' ')
   
   
 #  print "Compatibility in low mass: "+str(KSP_LowMass)
@@ -573,7 +582,7 @@ def AnalyzeThisSLHA(slhapath):
   for iRun in range(1,NRounds+1):
     rightnow=time.time()
     elapsed = rightnow-start
-    if elapsed>30*60: # more than half an hour has passed
+    if elapsed>10*60: # more than half an hour has passed
        print "This SLHA is taking too long to process - will stick with the statistics we currently have and be happy with that"
        break
     else: 
