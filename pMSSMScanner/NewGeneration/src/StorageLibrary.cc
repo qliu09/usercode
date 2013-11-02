@@ -12,7 +12,9 @@ void StorePoint(float pMSSMpars[],
                 float KSP_HM,  // Kolmogorov-Smirnov probability for high mass test
                 float KSP_MET,  // Kolmogorov-Smirnov probability for MET test
                 float KSP_BTag,  // Kolmogorov-Smirnov probability for btag test
-                float eff) // last test
+                float eff, // efficiency (selected in low mass / full stats)
+                float LMintegral, // low mass integral
+                float FullStats) // Full Stats
 {
     std::ofstream PointLog;
     PointLog.open("pointlog.txt",std::ios::app);
@@ -38,5 +40,7 @@ void StorePoint(float pMSSMpars[],
     PointLog << KSP_MET << " ";
     PointLog << KSP_BTag << " ";
     PointLog << eff << " ";
+    PointLog << LMintegral << " ";
+    PointLog << FullStats << " ";
     PointLog << std::endl;
 }

@@ -1,9 +1,8 @@
-#include <iostream>
-#include <fstream>
-
-
 #ifndef __StorageLibrary_h__INCLUDED
 #define __StorageLibrary_h__INCLUDED
+
+#include <iostream>
+#include <fstream>
 
 void StorePoint(float pMSSMpars[],
                 int SLHAValid=0, // first quick check (tachyons, charged LSP and so on)
@@ -14,7 +13,9 @@ void StorePoint(float pMSSMpars[],
                 float KSP_HM=-1,  // Kolmogorov-Smirnov probability for high mass test
                 float KSP_MET=-1,  // Kolmogorov-Smirnov probability for MET test
                 float KSP_BTag=-1,  // Kolmogorov-Smirnov probability for btag test
-                float eff=-1) // last test
+                float eff=-1, // efficiency
+                float LMintegral=-1, // low mass integral
+                float FullStats=-1) // Full Stats
 ;
 
 
