@@ -582,7 +582,7 @@ def AnalyzeThisSLHA(slhapath):
   for iRun in range(1,NRounds+1):
     rightnow=time.time()
     elapsed = rightnow-start
-    if elapsed>10*60: # more than half an hour has passed
+    if elapsed>30*60: # more than half an hour has passed
        print "This SLHA is taking too long to process - will stick with the statistics we currently have and be happy with that"
        break
     else: 
