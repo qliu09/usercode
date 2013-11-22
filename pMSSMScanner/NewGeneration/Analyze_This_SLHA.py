@@ -20,9 +20,9 @@ done=0
 elapsed=0
 
 
-NGenEvents=1000000
+NGenEvents=100000
 
-NRounds=1000
+NRounds=10
 
 DoIllustration=False ## if this is set to true you get nice plots for each signal point (but the script takes longer)
 
@@ -119,6 +119,12 @@ MllhistoLowMass.Sumw2();
 MllhistoLowMass.GetXaxis().SetTitle("m_{ll}")
 MllhistoLowMass.GetXaxis().CenterTitle()
 
+NLeptons = ROOT.TH1F("NLeptons","",10,-0.5,9.5);
+NLeptons.SetStats(0)
+NLeptons.Sumw2();
+NLeptons.GetXaxis().SetTitle("N_{l}")
+NLeptons.GetXaxis().CenterTitle()
+
 JetPthisto = ROOT.TH1F("JetPthisto","",200,0,1000);
 JetPthisto.SetStats(0)
 JetPthisto.Sumw2();
@@ -142,6 +148,12 @@ Mllhisto.SetStats(0)
 Mllhisto.Sumw2();
 Mllhisto.GetXaxis().SetTitle("m_{ll}")
 Mllhisto.GetXaxis().CenterTitle()
+
+MinBinMllhisto = ROOT.TH1F("MinBinMllhisto","",180,20,200);
+MinBinMllhisto.SetStats(0)
+MinBinMllhisto.Sumw2();
+MinBinMllhisto.GetXaxis().SetTitle("m_{ll}")
+MinBinMllhisto.GetXaxis().CenterTitle()
 
 HistoCentrality = ROOT.TH1F("HistoCentrality","",12,0.0,2.4);
 HistoCentrality.SetStats(0)
@@ -174,7 +186,7 @@ def StoreEvent():
 #    print "__________________________________________________________________"
 #    print "Found two leptons in event "+str(NEvent)
     global px, py, lE, nj, leptons, NBtags, met
-    global HistoCentrality,HistoBTagMultiplicity,Mllhisto,HistoJetMultiplicity,MllhistoLowMass,MllhistoZmass,MllhistoHighMass
+    global HistoCentrality,HistoBTagMultiplicity,Mllhisto,MinBinMllhisto,HistoJetMultiplicity,MllhistoLowMass,MllhistoZmass,MllhistoHighMass
     
     i1=0
     i2=-1
@@ -235,6 +247,7 @@ def StoreEvent():
             if nj>=3 and met>100:
               if centrality=="central":
                     Mllhisto.Fill(mll,Weight)
+                    MinBinMllhisto.Fill(mll,Weight)
               if centrality=="central" and mll>20 and mll<70:
                     HistoBTagMultiplicity.Fill(BTagMultiplicity,Weight)
                     HistoJetMultiplicity.Fill(JetMultiplicity,Weight)
@@ -246,6 +259,7 @@ def StoreEvent():
             if nj>=2 and met>150:
               if centrality=="central":
                     Mllhisto.Fill(mll,Weight)
+                    MinBinMllhisto.Fill(mll,Weight)
               if centrality=="central" and mll>20 and mll<70:
                     HistoBTagMultiplicity.Fill(BTagMultiplicity,Weight)
                     HistoJetMultiplicity.Fill(JetMultiplicity,Weight)
@@ -255,10 +269,11 @@ def StoreEvent():
                     MllhistoHighMass.Fill(mll,Weight)
 
 def ProcessEvent():
-  global px, py, nj,leptons, NBtags, met, mll
+  global px, py, nj,leptons, NBtags, met, mll, NLeptons
     
   if nj>=2 and len(leptons)>=2:
       StoreEvent()
+      NLeptons.Fill(len(leptons))
   px=0
   py=0
   nl=0
@@ -271,7 +286,7 @@ def ProcessEvent():
   leptons=[]
 
 def ProcessLine(line):
-  global px, py, nj, leptons, ht, NBtags, NEvent, JetPthisto
+  global px, py, nj, leptons, ht, NBtags, NEvent, JetPthisto, NLeptons
   
   tarray=line.split(" ")
   array=[]
@@ -361,7 +376,7 @@ def FillHistogram(filename):
     
     ProcessLine(line)
   
-def Illustrate(ThisHisto,RefHisto,filename,KSP) :
+def Illustrate(ThisHisto,RefHisto,filename,KSP,iRun) :
     RefHisto.SetLineColor(ROOT.TColor.GetColor("#FF0000"))
     RefHisto.Scale(ThisHisto.Integral()/RefHisto.Integral())
     RefHisto.SetMaximum(ThisHisto.GetMaximum()*1.3)
@@ -391,7 +406,7 @@ def Illustrate(ThisHisto,RefHisto,filename,KSP) :
 
     
 def FlipOnOverFlowBin():
-  global HistoBTagMultiplicity, HistoJetMultiplicity, Mllhisto, Methisto
+  global HistoBTagMultiplicity, HistoJetMultiplicity, Mllhisto, Methisto, MinBinMllhisto
 
   HistoBTagMultiplicity.SetBinContent(HistoBTagMultiplicity.GetNbinsX(),HistoBTagMultiplicity.GetBinContent(HistoBTagMultiplicity.GetNbinsX())+HistoBTagMultiplicity.GetBinContent(HistoBTagMultiplicity.GetNbinsX()+1))
   HistoBTagMultiplicity.SetBinContent(HistoBTagMultiplicity.GetNbinsX()+1,0)
@@ -407,6 +422,11 @@ def FlipOnOverFlowBin():
   Mllhisto.SetBinContent(Mllhisto.GetNbinsX()+1,0)
   Mllhisto.SetBinError(Mllhisto.GetNbinsX(),math.sqrt(pow(Mllhisto.GetBinError(Mllhisto.GetNbinsX()),2)+pow(Mllhisto.GetBinError(Mllhisto.GetNbinsX()+1),2)))
   Mllhisto.SetBinError(Mllhisto.GetNbinsX()+1,0)
+  
+  MinBinMllhisto.SetBinContent(MinBinMllhisto.GetNbinsX(),MinBinMllhisto.GetBinContent(MinBinMllhisto.GetNbinsX())+MinBinMllhisto.GetBinContent(MinBinMllhisto.GetNbinsX()+1))
+  MinBinMllhisto.SetBinContent(MinBinMllhisto.GetNbinsX()+1,0)
+  MinBinMllhisto.SetBinError(MinBinMllhisto.GetNbinsX(),math.sqrt(pow(MinBinMllhisto.GetBinError(MinBinMllhisto.GetNbinsX()),2)+pow(MinBinMllhisto.GetBinError(MinBinMllhisto.GetNbinsX()+1),2)))
+  MinBinMllhisto.SetBinError(MinBinMllhisto.GetNbinsX()+1,0)
 
   Methisto.SetBinContent(Methisto.GetNbinsX(),Methisto.GetBinContent(Methisto.GetNbinsX())+Methisto.GetBinContent(Methisto.GetNbinsX()+1))
   Methisto.SetBinContent(Methisto.GetNbinsX()+1,0)
@@ -416,9 +436,9 @@ def FlipOnOverFlowBin():
 
 
 def ComputeCompatibility(filename,slhaname,iRun):
-  global Methisto,Mllhisto,DoIllustration,HistoBTagMultiplicity,HistoJetMultiplicity,JetPthisto,NRounds,NGenEvents
+  global Methisto,Mllhisto,DoIllustration,HistoBTagMultiplicity,HistoJetMultiplicity,JetPthisto,NRounds,NGenEvents, NLeptons, MinBinMllhisto
   
-  RefFile = ROOT.TFile("DifferentialDistributions.root")
+  RefFile = ROOT.TFile("/shome/buchmann/Year_Of_SUSY_Discovery/NewSimulation/CMSSW_5_2_6/src/usercode/pMSSMScanner/DifferentialDistributions.root")
  
   FlipOnOverFlowBin() 
  
@@ -434,6 +454,8 @@ def ComputeCompatibility(filename,slhaname,iRun):
 #  RefHistoJetMultiplicity = RefFile.Get("dJet")
 #  KSP_Jet = RefHistoJetMultiplicity.KolmogorovTest(HistoJetMultiplicity)
         
+  RefMllhisto    = RefFile.Get("dMll");
+  
   RefHistoMllLow = RefFile.Get("dMll_Low")
   KSP_LM = RefHistoMllLow.KolmogorovTest(MllhistoLowMass)
         
@@ -480,7 +502,7 @@ def ComputeCompatibility(filename,slhaname,iRun):
   KSP_Final = KSP_LM + KSP_HM + KSP_MET + KSP_BTag
   
   PResult=str(("{0:.10f}".format(KSP_Final)))
-  PResult="0p"+PResult[2:]
+  PResult=PResult[0:1]+"p"+PResult[2:]
   
   mswrite = open("Marker.txt",'w')
   mswrite.write(PResult)
@@ -523,7 +545,9 @@ def ComputeCompatibility(filename,slhaname,iRun):
   OutFile.cd()
   HistoBTagMultiplicity.Write()
   Mllhisto.Write()
+  MinBinMllhisto.Write()
   Methisto.Write()
+  NLeptons.Write()
   HistoJetMultiplicity.Write()
   JetPthisto.Write()
   OutFile.Close()
@@ -537,9 +561,10 @@ def ComputeCompatibility(filename,slhaname,iRun):
 #  Illustrate(HistoCentrality,RefHistoCentrality,slhaname,KSP_Centrality)
 #  Illustrate(HistoBTagMultiplicity,RefHistoBTagMultiplicity,slhaname,KSP_BTag)
 #  Illustrate(Mllhisto,RefMllhisto,slhaname,KSP_Mass)
-  Illustrate(MllhistoLowMass,RefHistoMllLow,slhaname,KSP_LM)
-  Illustrate(MllhistoHighMass,RefHistoMllHigh,slhaname,KSP_HM)
-  Illustrate(Methisto,RefMEThisto,slhaname,KSP_MET)
+  Illustrate(MllhistoLowMass,RefHistoMllLow,slhaname,KSP_LM,iRun)
+  Illustrate(MllhistoHighMass,RefHistoMllHigh,slhaname,KSP_HM,iRun)
+  Illustrate(Methisto,RefMEThisto,slhaname,KSP_MET,iRun)
+  Illustrate(Mllhisto,RefMllhisto,slhaname,-1,iRun);
 #  Illustrate(HistoJetMultiplicity,RefHistoJetMultiplicity,slhaname,KSP_Jet)
 #  Illustrate(MllhistoZmass,RefMllhistoZmass,slhaname,KSP_ZMass)
 #  Illustrate(MllhistoHighMass,RefMllhistoHighMass,slhaname,KSP_HighMass)
@@ -582,7 +607,7 @@ def AnalyzeThisSLHA(slhapath):
   for iRun in range(1,NRounds+1):
     rightnow=time.time()
     elapsed = rightnow-start
-    if elapsed>30*60: # more than half an hour has passed
+    if elapsed>30*60: # more than 2 hours have passed
        print "This SLHA is taking too long to process - will stick with the statistics we currently have and be happy with that"
        break
     else: 
